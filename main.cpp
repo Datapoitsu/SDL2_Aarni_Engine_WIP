@@ -21,6 +21,8 @@ struct Unit{
     float posX = WIDTH / 2;
     float posY = HEIGHT / 2;
     float movementSpeed = 100;
+    float jumpForce = 10;
+    double jumpTimer = 0; 
 };
 
 struct Action{
@@ -48,8 +50,13 @@ int main(int argc, char *argv[])
     
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
 
-    struct Unit Player = { {WIDTH / 2, HEIGHT / 2, 128, 128}, IMG_LoadTexture(renderer, "src/Game/Sprites/hahmo.png")};
-    struct Unit floor = { {WIDTH / 2 - 128, HEIGHT / 2 + 100, 256, 32}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")};
+    struct Unit Player = { {WIDTH / 2, HEIGHT / 2, 128, 128}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot32.png")};
+    
+    struct Unit blocks[] = {
+    {{WIDTH / 2 - 128, HEIGHT / 2 + 100, 256, 32}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")},
+    {{WIDTH / 2 - 128, HEIGHT / 2 - 100, 256, 32}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")},
+    {{WIDTH - 16, WIDTH - 16, 16, 16}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")},
+    };
 	
     SDL_QueryTexture(Player.sprite, NULL, NULL, &Player.rect.w, &Player.rect.h);
 	
@@ -57,6 +64,9 @@ int main(int argc, char *argv[])
     
     //Begining of calculating time.
     mingw_gettimeofday(&t1, NULL); 
+
+    float velocityY = 0;
+
 
     while (true)
     {
@@ -82,7 +92,7 @@ int main(int argc, char *argv[])
         float x = 0;
         float y = 0;
         if(actions[0].isPressed){
-            y -= 1;
+            velocityY -= Player.jumpForce;
         }
         if(actions[1].isPressed){
             y += 1;
@@ -95,12 +105,56 @@ int main(int argc, char *argv[])
         }
         
         //Normalize.
+        /*
         float magnitude = sqrt(x*x + y*y);
         if(magnitude != 0){
             x /= magnitude;
             y /= magnitude;
         }
-        
+        */
+
+        /*if (y < 0){
+            y*= Player.jumpForce;
+        }*/
+        y += velocityY;
+        velocityY += deltaTime * 9.14;
+
+        for(int i = 0; i < sizeof(blocks) / sizeof(blocks[0]); i++){
+            if(x > 0){ //Right side collision
+                if(Player.posX + x * deltaTime * Player.movementSpeed + Player.rect.w - 1 > blocks[i].rect.x && Player.posX + x * deltaTime * Player.movementSpeed < blocks[i].rect.x + blocks[i].rect.w){
+                    if(Player.posY + Player.rect.h > blocks[i].rect.y + 1 && Player.posY < blocks[i].rect.y + blocks[i].rect.h - 1){
+                        x = 0;
+                    }
+                }
+            }
+
+            if(x < 0){ //Left side collision
+                if(Player.posX + x * deltaTime * Player.movementSpeed + Player.rect.w / 2 > blocks[i].rect.x && Player.posX + x * deltaTime * Player.movementSpeed < blocks[i].rect.x + blocks[i].rect.w){
+                    if(Player.posY + Player.rect.h > blocks[i].rect.y + 1 && Player.posY < blocks[i].rect.y + blocks[i].rect.h - 1){
+                        x = 0;
+                    }       
+                }
+            }
+
+            if(y > 0){ //Down side collision
+                if(Player.posY + y * deltaTime * Player.movementSpeed + Player.rect.h - 1 > blocks[i].rect.y && Player.posY + y * deltaTime * Player.movementSpeed < blocks[i].rect.y + blocks[i].rect.h){
+                    if(Player.posX + Player.rect.w > blocks[i].rect.x + 1 && Player.posX < blocks[i].rect.x + blocks[i].rect.w - 1){
+                        y = 0;
+                        velocityY = 0;
+                    }
+                }
+            }
+
+            if(y < 0){ //Left side collision
+                if(Player.posY + y * deltaTime * Player.movementSpeed + Player.rect.h / 2 > blocks[i].rect.y && Player.posY + y * deltaTime * Player.movementSpeed < blocks[i].rect.y + blocks[i].rect.h){
+                    if(Player.posX + Player.rect.w > blocks[i].rect.x + 1 && Player.posX < blocks[i].rect.x + blocks[i].rect.w - 1){
+                        y = 0;
+                    }       
+                }
+            }
+        }
+
+
         Player.posX += x * deltaTime * Player.movementSpeed;
         Player.posY += y * deltaTime * Player.movementSpeed;
         Player.rect = {(int)Player.posX,(int)Player.posY,Player.rect.w,Player.rect.h};
@@ -108,7 +162,11 @@ int main(int argc, char *argv[])
         SDL_RenderClear(renderer); 
         SDL_SetRenderDrawColor(renderer, 125, 125, 125, 255);
         SDL_RenderCopy(renderer, Player.sprite, NULL, &Player.rect);
-        SDL_RenderCopy(renderer, floor.sprite, NULL, &floor.rect);
+        
+        //Level
+        for(int i = 0; i < sizeof(blocks) / sizeof(blocks[0]); i++){
+            SDL_RenderCopy(renderer, blocks[i].sprite, NULL, &blocks[i].rect);
+        }
         SDL_RenderPresent(renderer);
 
         //fps limiter
