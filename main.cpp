@@ -1,13 +1,27 @@
 #include <iostream>
+#include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <math.h>
 #include <time.h>
 #include <windows.h>
+#include <AarniEngine/input.h>
+#include <AarniEngine/vector.h>
+#include <AarniEngine/sprite.h>
 
 #define PI 3.141592654
 
-const int WIDTH = 400, HEIGHT = 400;
+//Function declaration
+void Update(float deltaTime);
+void Start();
+void createWindow();
+void UpdateRendering();
+
+//Application variables
+SDL_Window *window;
+SDL_Renderer *renderer;
+const int width = 400, heigth = 400;
+bool endApp = false;
 
 // Time calculation
 timeval t1, t2;
@@ -17,161 +31,53 @@ int fpsLimiter = 60;
 
 struct Unit{
     SDL_Rect rect;
+    SDL_Rect dstrect;
     SDL_Texture *sprite;
-    float posX = WIDTH / 2;
-    float posY = HEIGHT / 2;
-    float movementSpeed = 100;
+    Vector position = {width / 2, heigth / 2, 0};
+    float movementSpeed = 200;
     float jumpForce = 10;
     double jumpTimer = 0; 
 };
 
-struct Action{
-    SDL_KeyCode Key;
-    bool isPressed = false;
-};
-
-Action actions[]{
-    Action{SDLK_w},
-    Action{SDLK_s},
-    Action{SDLK_a},
-    Action{SDLK_d},
-};
+Unit a;
 
 int main(int argc, char *argv[])
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
-    SDL_Window *window = SDL_CreateWindow("SDL Practice",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,WIDTH,HEIGHT,SDL_WINDOW_ALLOW_HIGHDPI);
-
-    if (window == NULL)
-    {
-        std::cout << "Could now create window: " << SDL_GetError() << std::endl;
+    createWindow();
+    if(window == NULL){
         return 1;
     }
-    
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, 0);
 
-    struct Unit Player = { {WIDTH / 2, HEIGHT / 2, 128, 128}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot32.png")};
-    
-    struct Unit blocks[] = {
-    {{WIDTH / 2 - 128, HEIGHT / 2 + 100, 256, 32}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")},
-    {{WIDTH / 2 - 128, HEIGHT / 2 - 100, 256, 32}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")},
-    {{WIDTH - 16, WIDTH - 16, 16, 16}, IMG_LoadTexture(renderer, "src/Game/Sprites/dot.png")},
-    };
-	
-    SDL_QueryTexture(Player.sprite, NULL, NULL, &Player.rect.w, &Player.rect.h);
-	
-    SDL_Event Event;
-    
+    Start();
+
     //Begining of calculating time.
     mingw_gettimeofday(&t1, NULL); 
 
-    float velocityY = 0;
-
-
     while (true)
     {
+        //Ending application.
+        SDL_Event Event;
         if (SDL_PollEvent(&Event))
         {
             if (SDL_QUIT == Event.type)
             {
-                break;
-            }
-
-            for(int i = 0; i < sizeof(actions); i++){
-                if (Event.key.keysym.sym == actions[i].Key){
-                    if(Event.type == SDL_KEYDOWN){
-                        actions[i].isPressed = true;
-                    }
-                    if(Event.type == SDL_KEYUP){
-                        actions[i].isPressed = false;
-                    }
-                }
+                endApp = true;
             }
         }
-
-        float x = 0;
-        float y = 0;
-        if(actions[0].isPressed){
-            velocityY -= Player.jumpForce;
-        }
-        if(actions[1].isPressed){
-            y += 1;
-        }
-        if(actions[2].isPressed){
-            x -= 1;
-        }
-        if(actions[3].isPressed){
-            x += 1;
-        }
-        
-        //Normalize.
-        /*
-        float magnitude = sqrt(x*x + y*y);
-        if(magnitude != 0){
-            x /= magnitude;
-            y /= magnitude;
-        }
-        */
-
-        /*if (y < 0){
-            y*= Player.jumpForce;
-        }*/
-        y += velocityY;
-        velocityY += deltaTime * 9.14;
-
-        for(int i = 0; i < sizeof(blocks) / sizeof(blocks[0]); i++){
-            if(x > 0){ //Right side collision
-                if(Player.posX + x * deltaTime * Player.movementSpeed + Player.rect.w - 1 > blocks[i].rect.x && Player.posX + x * deltaTime * Player.movementSpeed < blocks[i].rect.x + blocks[i].rect.w){
-                    if(Player.posY + Player.rect.h > blocks[i].rect.y + 1 && Player.posY < blocks[i].rect.y + blocks[i].rect.h - 1){
-                        x = 0;
-                    }
-                }
-            }
-
-            if(x < 0){ //Left side collision
-                if(Player.posX + x * deltaTime * Player.movementSpeed + Player.rect.w / 2 > blocks[i].rect.x && Player.posX + x * deltaTime * Player.movementSpeed < blocks[i].rect.x + blocks[i].rect.w){
-                    if(Player.posY + Player.rect.h > blocks[i].rect.y + 1 && Player.posY < blocks[i].rect.y + blocks[i].rect.h - 1){
-                        x = 0;
-                    }       
-                }
-            }
-
-            if(y > 0){ //Down side collision
-                if(Player.posY + y * deltaTime * Player.movementSpeed + Player.rect.h - 1 > blocks[i].rect.y && Player.posY + y * deltaTime * Player.movementSpeed < blocks[i].rect.y + blocks[i].rect.h){
-                    if(Player.posX + Player.rect.w > blocks[i].rect.x + 1 && Player.posX < blocks[i].rect.x + blocks[i].rect.w - 1){
-                        y = 0;
-                        velocityY = 0;
-                    }
-                }
-            }
-
-            if(y < 0){ //Left side collision
-                if(Player.posY + y * deltaTime * Player.movementSpeed + Player.rect.h / 2 > blocks[i].rect.y && Player.posY + y * deltaTime * Player.movementSpeed < blocks[i].rect.y + blocks[i].rect.h){
-                    if(Player.posX + Player.rect.w > blocks[i].rect.x + 1 && Player.posX < blocks[i].rect.x + blocks[i].rect.w - 1){
-                        y = 0;
-                    }       
-                }
-            }
+        if(endApp)
+        {
+            break;
         }
 
+        UpdateInputs(Event);
 
-        Player.posX += x * deltaTime * Player.movementSpeed;
-        Player.posY += y * deltaTime * Player.movementSpeed;
-        Player.rect = {(int)Player.posX,(int)Player.posY,Player.rect.w,Player.rect.h};
+        Update(deltaTime); //Write into updata function things that should repeat every frame.
 
-        SDL_RenderClear(renderer); 
-        SDL_SetRenderDrawColor(renderer, 125, 125, 125, 255);
-        SDL_RenderCopy(renderer, Player.sprite, NULL, &Player.rect);
-        
-        //Level
-        for(int i = 0; i < sizeof(blocks) / sizeof(blocks[0]); i++){
-            SDL_RenderCopy(renderer, blocks[i].sprite, NULL, &blocks[i].rect);
-        }
-        SDL_RenderPresent(renderer);
+        UpdateRendering();
 
         //fps limiter
         Sleep(std::max(0.0,(1000 / fpsLimiter) - (deltaTime * 1000)));
-        
+
         //Calculating passing time.
         mingw_gettimeofday(&t2, NULL);
         elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;
@@ -184,4 +90,84 @@ int main(int argc, char *argv[])
     SDL_Quit();
 
     return 1;
+}
+
+void createWindow()
+{
+    SDL_Init(SDL_INIT_EVERYTHING);
+    window = SDL_CreateWindow("SDL Practice",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width,heigth,SDL_WINDOW_ALLOW_HIGHDPI);
+
+    if (window != NULL)
+    {
+        renderer = SDL_CreateRenderer(window, -1, 0);
+    }
+    else
+    {
+        std::cout << "Could now create window: " << SDL_GetError() << std::endl;
+    }
+}
+
+void QuitApplication(){
+    endApp = true;
+}
+
+void Start(){
+    /*
+    a.rect = {32,32,32,32};
+    a.sprite = IMG_LoadTexture(renderer, "src/Game/Sprites/hahmo.png");
+    a.dstrect = {0,0,16,16};
+    */
+
+    Texture T;
+    T.texture = IMG_LoadTexture(renderer, "src/Game/Sprites/hahmo.png");
+    SplitTexture(&T,*T.sprites,2,2);
+
+
+    a.rect = {32,32,32,32};
+    a.sprite = T.texture;
+    a.dstrect = *T.sprites[0];
+
+    /*
+    Texture T;
+    T.texture = IMG_LoadTexture(renderer, "src/Game/Sprites/hahmo.png");
+    SplitTexture(&T,T.sprites,2,2);
+    a.sprite = T.texture;
+    a.dstrect = *T.sprites[2];
+    for(int i = 0; i < 4; i++){
+        SDL_Rect r = *T.sprites[i];
+        std::cout << "Main " << i << ": " << r.x << "," << r.y << "," << r.w << "," << r.h << std::endl;
+    }
+    */
+}
+
+void Update(float deltaTime)
+{
+    Vector direction = {0,0,0};
+    if(GetActionByName("Up")){
+        direction.y -= 1;
+    }
+    if(GetActionByName("Down")){
+        direction.y += 1;
+    }
+    if(GetActionByName("Left")){
+        direction.x -= 1;
+    }
+    if(GetActionByName("Right")){
+        direction.x += 1;
+    }
+
+    normalize(&direction);
+
+    a.position.x += direction.x * deltaTime * a.movementSpeed;
+    a.position.y += direction.y * deltaTime * a.movementSpeed;
+    a.rect.x = round(a.position.x);
+    a.rect.y = round(a.position.y);
+}
+
+void UpdateRendering()
+{
+    SDL_RenderClear(renderer); 
+    SDL_SetRenderDrawColor(renderer, 125, 125, 125, 255);
+    SDL_RenderCopy(renderer, a.sprite, &a.dstrect, &a.rect);
+    SDL_RenderPresent(renderer);
 }
