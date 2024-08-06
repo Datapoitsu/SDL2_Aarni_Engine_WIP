@@ -28,6 +28,7 @@ timeval t1, t2;
 double elapsedTime;
 double deltaTime;
 int fpsLimiter = 60;
+int e = 0;
 
 struct Unit{
     SDL_Rect rect;
@@ -72,6 +73,8 @@ int main(int argc, char *argv[])
         UpdateInputs(Event);
 
         Update(deltaTime); //Write into updata function things that should repeat every frame.
+
+        UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
         UpdateRendering();
 
@@ -154,6 +157,15 @@ void Update(float deltaTime)
     }
     if(GetActionByName("Right")){
         direction.x += 1;
+    }
+
+    if(GetActionDownByName("Activate")){
+        e++;
+        std::cout << "Down for " << e << std::endl;
+    }
+    if(GetActionUpByName("Activate")){
+        e++;
+        std::cout << "Up for " << e << std::endl;
     }
 
     normalize(&direction);

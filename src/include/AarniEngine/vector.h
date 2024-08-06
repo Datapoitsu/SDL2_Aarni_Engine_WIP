@@ -4,6 +4,8 @@ struct Vector{
     float x, y, z = 0;
 };
 
+
+
 void normalize(struct Vector *v)
 {
     if(v->x != 0 || v->y != 0 || v->z != 0)

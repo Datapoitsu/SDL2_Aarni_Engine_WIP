@@ -1,13 +1,15 @@
 #include <SDL2/SDL.h>
 #include <string.h>
 
-struct Buttons{
+struct Buttons //Has all buttons for an action. Action can have more than one buttons struct.
+{
     SDL_KeyCode keys[3];
     bool isPressed[3] = {false,false,false};
+    bool previouslyPressed[3] = {false,false,false};
 };
 
-//Action is something that you would see in binding settings as an action.
-struct Action{
+struct Action //Action is something that you would see in binding settings as an action.
+{
     char name[20];
     struct Buttons buttons[2];
 };
@@ -56,10 +58,21 @@ Action actions[] = {
                 {SDLK_RIGHT,SDLK_UNKNOWN,SDLK_UNKNOWN},
             }
         }
+    },
+    {
+        {"Activate"},
+        {
+            {
+                {SDLK_e,SDLK_r,SDLK_q},
+            },
+            {
+                {SDLK_UNKNOWN,SDLK_UNKNOWN,SDLK_UNKNOWN},
+            }
+        }
     }
 };
 
-void UpdateInputs(SDL_Event e)
+void UpdateInputs(SDL_Event e) //Checks all defined actions and if the buttons are pressed.
 {
     for(int i = 0; i < sizeof(actions) / sizeof(actions[0]); i++)
     {
@@ -83,10 +96,124 @@ void UpdateInputs(SDL_Event e)
     }
 }
 
-bool GetAction(struct Action a){
+void UpdatePreviousInputs(SDL_Event e) //Sets values for previously pressed buttons. Used for GetKeyUp & GetKeyDown.
+{
+    for(int i = 0; i < sizeof(actions) / sizeof(actions[0]); i++)
+    {
+        for(int k = 0; k < 2; k++)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                actions[i].buttons[k].previouslyPressed[j] = actions[i].buttons[k].isPressed[j];
+            }
+        }
+    }
+}
+
+bool GetAction(struct Action a)
+{
     for(int i = 0; i < 2; i++)
     {
-        //No binding.
+        //Checks if there isn't any bindings.
+        bool emptyButtons = true;
+        for(int k = 0; k < 3; k++){
+            if(a.buttons[i].keys[k] != SDLK_UNKNOWN){
+                emptyButtons = false;
+                break;
+            }
+        }
+        if(emptyButtons == true) //Current actions had no binding at all.
+        {
+            continue;
+        }
+        
+        //Check buttons.
+        bool isPressed = true;
+        for(int k = 0; k < 3; k++){
+            //If non-empty button isn't pressed, then no input.
+            if(a.buttons[i].keys[k] != SDLK_UNKNOWN && a.buttons[i].isPressed[k] == false){
+                isPressed = false;
+                break;
+            }
+        }
+        if(isPressed)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool GetActionByName(std::string name) //Version with string.
+{
+    //Checks through all actions to find the correct action.
+    for(int i = 0; i < sizeof(actions) / sizeof(actions[0]); i++){
+        if(actions[i].name == name){
+            return GetAction(actions[i]);
+        }
+    }
+    printf("Couldn't find an input for action named: %s \n",name);
+    return false;
+};
+
+bool GetActionDown(Action a) //Action down is the moment when key goes from up state to down state
+{
+    for(int i = 0; i < 2; i++)
+    {
+        //Checks if there isn't any bindings
+        bool emptyButtons = true;
+        for(int k = 0; k < 3; k++){
+            if(a.buttons[i].keys[k] != SDLK_UNKNOWN){
+                emptyButtons = false;
+                break;
+            }
+        }
+        if(emptyButtons == true) //Current actions had no binding at all.
+        {
+            continue;
+        }
+        
+        //Check buttons
+        bool isPressed = true;
+        for(int k = 0; k < 3; k++)
+        {
+            //If non-empty button isn't pressed, then no input
+            if(a.buttons[i].keys[k] != SDLK_UNKNOWN && a.buttons[i].isPressed[k] == false)
+            {
+                isPressed = false;
+                break;
+            }
+        }
+
+        if(isPressed) //Checking if previously pressed is false
+        {
+            for(int k = 0; k < 3; k++){
+                if(a.buttons[i].previouslyPressed[k] == false && a.buttons[i].keys[k] != SDLK_UNKNOWN)
+                {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+bool GetActionDownByName(std::string name) //Version with string.
+{
+    for(int i = 0; i < sizeof(actions) / sizeof(actions[0]); i++){
+        if(actions[i].name == name){
+            return GetActionDown(actions[i]);
+        }
+    }
+    printf("Couldn't find an input for action named: %s \n",name);
+    return false;
+}
+
+bool GetActionUp(Action a)
+{
+    for(int i = 0; i < 2; i++)
+    {
+        //Checks if there isn't any bindings
         bool emptyButtons = true;
         for(int k = 0; k < 3; k++){
             if(a.buttons[i].keys[k] != SDLK_UNKNOWN){
@@ -98,37 +225,36 @@ bool GetAction(struct Action a){
             continue;
         }
         
-        //Check buttons
-        bool isPressed = true;
+        //Check that if a button isn't pressed
+        bool isntPressed = false;
         for(int k = 0; k < 3; k++){
-            //If non-empty button isn't pressed, then no input
             if(a.buttons[i].keys[k] != SDLK_UNKNOWN && a.buttons[i].isPressed[k] == false){
-                isPressed = false;
+                isntPressed = true;
                 break;
             }
         }
-        if(isPressed){
+
+        if(isntPressed)
+        {
+            //Checking if previously pressed is false
+            for(int k = 0; k < 3; k++){
+                if(a.buttons[i].previouslyPressed[k] == false && a.buttons[i].keys[k] != SDLK_UNKNOWN){
+                    return false;
+                }
+            }
             return true;
         }
     }
-
     return false;
 }
 
-bool GetActionByName(std::string name){
+bool GetActionUpByName(std::string name) //Version with string.
+{
     for(int i = 0; i < sizeof(actions) / sizeof(actions[0]); i++){
         if(actions[i].name == name){
-            return GetAction(actions[i]);
+            return GetActionUp(actions[i]);
         }
     }
-    printf("Couldn't find an input for action named: %s",name);
-    return false;
-};
-
-bool GetActionDown(Action a){
-    return false;
-}
-
-bool GetActionUp(Action a){
+    printf("Couldn't find an input for action named: %s \n",name);
     return false;
 }
