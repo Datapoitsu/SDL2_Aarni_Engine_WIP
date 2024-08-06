@@ -27,7 +27,7 @@ void SplitTexture(Texture *Tex, SDL_Rect sprites[], int hor, int ver){
         for(int h = 0; h < hor; h++)
         {
             s[h + v * hor] = {h * sw, v * sh, sw, sh};
-            std::cout << h + v * hor << ". " << s[h + v * hor].x << ", " << s[h + v * hor].y << ", " << s[h + v * hor].w << ", " << s[h + v * hor].h << std::endl;
+            //std::cout << h + v * hor << ". " << s[h + v * hor].x << ", " << s[h + v * hor].y << ", " << s[h + v * hor].w << ", " << s[h + v * hor].h << std::endl;
         }
     }
     sprites = s;

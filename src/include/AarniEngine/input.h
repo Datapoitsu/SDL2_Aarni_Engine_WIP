@@ -72,6 +72,124 @@ Action actions[] = {
     }
 };
 
+void UnbindAll(Action a[]) //
+{
+    for(int i = 0; i < sizeof(*a) / 12; i++){
+        for(int k = 0; k < 2; k++){
+            for(int j = 0; j < 3; j++){
+                a[i].buttons[k].keys[j] = SDLK_UNKNOWN;
+            }
+        }
+    }
+}
+
+SDL_Keycode ConfigToKeycode(std::string s)
+{
+    std::cout << "config to keycode: " << s << std::endl;
+    if(s == "a"){return SDLK_a;}
+    if(s == "b"){return SDLK_b;}
+    if(s == "d"){return SDLK_d;}
+    if(s == "e"){return SDLK_e;}
+    if(s == "r"){return SDLK_r;}
+    if(s == "s"){return SDLK_s;}
+    if(s == "t"){return SDLK_t;}
+    if(s == "w"){return SDLK_w;}
+    if(s == "up"){return SDLK_UP;}
+    if(s == "down"){return SDLK_DOWN;}
+    return SDLK_UNKNOWN;
+}
+
+void ReadConfig(Action a[]) //Sets the values to actions.
+{
+    FILE *fptr;
+
+    fptr = fopen("Binding.config", "r");
+
+    if(fptr == NULL)
+    {
+        printf("Not able to open the file.");
+        fclose(fptr); 
+        return;
+    }
+
+    UnbindAll(a); //Clears old bindings for the next one
+    
+    const int bufferSize = 100;
+    char myString[bufferSize];
+
+    while(fgets(myString, bufferSize, fptr)) // Read the content and print it.
+    {
+        std::cout << "\n" << std::endl;
+        printf("%s", myString);
+        //Count the size of the name of the action.
+        int nameLength = 0;
+        for(int i = 0; i < bufferSize; i++)
+        {
+            if(myString[i] == '{')
+            {
+                break;
+            }
+            nameLength++;
+        }
+
+        for(int i = 0; i < sizeof(*a) / 12; i++) //Loop actions.
+        {
+            bool sameName = true;
+            for(int k = 0; k < nameLength; k++) //Loop action name
+            {
+                if(a[i].name[k] != myString[k])
+                {
+                    sameName = false;
+                    break;
+                }
+            }
+
+            if(sameName == true)
+            {
+                int holder = nameLength + 1;
+                int curButton = 0;
+                int curKey = 0;
+                std::cout << "Holder: " << holder << ", size:" << sizeof(myString) << std::endl;
+                for(int k = holder; k < sizeof(myString); k++)
+                {
+                    if(myString[k] == ',' || myString[k] == '}')
+                    {
+                        char h[0];
+                        memcpy(h, &myString[holder], k - holder);
+
+                        std::cout << "Cur letter: " << h << "; holder: " << holder << " k: " << k << ", k-holder: " << k - holder << ", size(h): " << sizeof(h) << std::endl;
+                        a[i].buttons[curButton].keys[curKey] = (SDL_KeyCode)ConfigToKeycode(h);
+                        if(myString[k] == ',')
+                        {
+                            holder = k + 1;
+                            curKey++;
+                        }
+                        else
+                        {
+                            holder = k + 3;
+                            k += 2;
+                            curKey = 0;
+                            curButton++;
+                        }
+                    }
+                }
+            }
+        }
+
+        
+        
+    }
+
+    fclose(fptr); // Close the file
+
+    printf("\n");
+    for(int i = 0; i < sizeof(*a) / 12; i++) //Loop actions.
+    {
+        std::cout << a[i].name << ", 1: " << (char)a[i].buttons[0].keys[0] << ", " << (char)a[i].buttons[0].keys[1] << ", " << (char)a[i].buttons[0].keys[2] << " 2: " << (char)a[i].buttons[1].keys[0] << ", " << (char)a[i].buttons[1].keys[1] << ", " << (char)a[i].buttons[1].keys[2] << std::endl;
+    }
+    
+}
+
 void UpdateInputs(SDL_Event e) //Checks all defined actions and if the buttons are pressed.
 {
     for(int i = 0; i < sizeof(actions) / sizeof(actions[0]); i++)
@@ -152,7 +270,7 @@ bool GetActionByName(std::string name) //Version with string.
             return GetAction(actions[i]);
         }
     }
-    printf("Couldn't find an input for action named: %s \n",name);
+    //printf("Couldn't find an input for action named: %s \n",name);
     return false;
 };
 
@@ -205,7 +323,7 @@ bool GetActionDownByName(std::string name) //Version with string.
             return GetActionDown(actions[i]);
         }
     }
-    printf("Couldn't find an input for action named: %s \n",name);
+    //printf("Couldn't find an input for action named: %s \n",name);
     return false;
 }
 
@@ -236,13 +354,18 @@ bool GetActionUp(Action a)
 
         if(isntPressed)
         {
-            //Checking if previously pressed is false
-            for(int k = 0; k < 3; k++){
-                if(a.buttons[i].previouslyPressed[k] == false && a.buttons[i].keys[k] != SDLK_UNKNOWN){
-                    return false;
+            //Checking if previously pressed is true
+            int prevPressed = 0;
+            for(int k = 0; k < 3; k++)
+            {
+                if(a.buttons[i].keys[k] == SDLK_UNKNOWN || a.buttons[i].previouslyPressed[k] == true)
+                { 
+                    prevPressed++;
                 }
             }
-            return true;
+            if(prevPressed == 3){
+                return true;
+            }
         }
     }
     return false;
@@ -255,6 +378,6 @@ bool GetActionUpByName(std::string name) //Version with string.
             return GetActionUp(actions[i]);
         }
     }
-    printf("Couldn't find an input for action named: %s \n",name);
+    //printf("Couldn't find an input for action named: %s \n",name);
     return false;
 }

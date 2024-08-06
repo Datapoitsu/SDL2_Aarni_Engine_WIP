@@ -28,7 +28,6 @@ timeval t1, t2;
 double elapsedTime;
 double deltaTime;
 int fpsLimiter = 60;
-int e = 0;
 
 struct Unit{
     SDL_Rect rect;
@@ -114,7 +113,10 @@ void QuitApplication(){
     endApp = true;
 }
 
-void Start(){
+void Start()
+{
+    ReadConfig(actions);
+
     /*
     a.rect = {32,32,32,32};
     a.sprite = IMG_LoadTexture(renderer, "src/Game/Sprites/hahmo.png");
@@ -159,14 +161,19 @@ void Update(float deltaTime)
         direction.x += 1;
     }
 
-    if(GetActionDownByName("Activate")){
-        e++;
-        std::cout << "Down for " << e << std::endl;
+    char arr[5][10] = {"Up","Down", "Left", "Right", "Activate"};
+    for(int i = 0; i < 5; i++){
+        if(GetActionDownByName(arr[i]))
+        {
+            std::cout << "Action [" << arr[i] << "] pressed down" << std::endl;
+        }
+        if(GetActionUpByName(arr[i]))
+        {
+            std::cout << "Up for [" << arr[i] << "] pressed up" << std::endl;
+        }
     }
-    if(GetActionUpByName("Activate")){
-        e++;
-        std::cout << "Up for " << e << std::endl;
-    }
+
+
 
     normalize(&direction);
 
