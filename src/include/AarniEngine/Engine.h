@@ -21,7 +21,7 @@ void UpdateRendering();
 //Application variables
 SDL_Window *window;
 SDL_Renderer *renderer;
-const int width = 400, heigth = 400;
+const int width = 1000, heigth = 1000;
 bool endApp = false;
 
 // Time calculation

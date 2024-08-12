@@ -26,4 +26,7 @@ void normalize(struct Vector *v)
     }
 }
 
+float vectorDistance(Vector *v1, Vector *v2){
+    return (float)(sqrt(pow(v2->x - v1->x,2) + pow(v2->y - v1->y,2) + pow(v2->z - v1->z,2)));
+}
 #endif
