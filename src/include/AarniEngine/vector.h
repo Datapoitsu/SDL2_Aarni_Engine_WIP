@@ -1,10 +1,19 @@
+#ifndef _VECTORH_
+
+#define _VECTORH_
 #include <math.h>
+#define Vector_Right {1,0,0}
+#define Vector_Left {-1,0,0}
+#define Vector_Up {0,1,0}
+#define Vector_Down {0,-1,0}
+#define Vector_Forward {0,0,1}
+#define Vector_Back {0,0,-1}
+#define Vector_One {1,1,1}
+#define Vector_Zero {0,0,0}
 
 struct Vector{
     float x, y, z = 0;
 };
-
-
 
 void normalize(struct Vector *v)
 {
@@ -16,3 +25,5 @@ void normalize(struct Vector *v)
         v->z = v->z / magnitude;
     }
 }
+
+#endif
