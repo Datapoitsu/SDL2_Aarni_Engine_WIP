@@ -1,3 +1,6 @@
+#ifndef _INPUTH_
+#define _INPUTH_
+
 #include <SDL2/SDL.h>
 #include <string.h>
 
@@ -381,3 +384,5 @@ bool GetActionUpByName(std::string name) //Version with string.
     //printf("Couldn't find an input for action named: %s \n",name);
     return false;
 }
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef _ENGINEH_
+#define _ENGINEH_
+
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
@@ -29,6 +32,12 @@ timeval t1, t2;
 double elapsedTime;
 double deltaTime;
 int fpsLimiter = 60;
+
+struct GameObject{
+    char name[32];
+    Transform transform;
+    void *components[];
+};
 
 int main(int argc, char *argv[])
 {
@@ -104,7 +113,12 @@ void QuitApplication(){
 
 void UpdateRendering()
 {
-    SDL_RenderClear(renderer); 
     SDL_SetRenderDrawColor(renderer, 125, 125, 125, 255);
+    
+
+
     SDL_RenderPresent(renderer);
+    SDL_RenderClear(renderer); //Clear afterwards
 }
+
+#endif

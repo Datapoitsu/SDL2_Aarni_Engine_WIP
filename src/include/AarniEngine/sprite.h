@@ -1,3 +1,6 @@
+#ifndef _SPRITEH_
+#define _SPRITEH_
+
 #include <SDL2/SDL_image.h>
 
 struct Texture{
@@ -54,3 +57,5 @@ void SplitTexture(Texture *Tex, SDL_Rect *sprites[], int horizontalCount, int ve
     std::cout << "Size: " << sizeof(sprites) / sizeof(sprites[0]) << std::endl;
 }
 */
+
+#endif
