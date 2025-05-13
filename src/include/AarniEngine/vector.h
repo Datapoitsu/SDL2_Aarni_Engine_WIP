@@ -1,6 +1,6 @@
 #ifndef _VECTORH_
-
 #define _VECTORH_
+
 #include <math.h>
 #define Vector_Right {1,0,0}
 #define Vector_Left {-1,0,0}
@@ -11,11 +11,11 @@
 #define Vector_One {1,1,1}
 #define Vector_Zero {0,0,0}
 
-struct Vector{
+struct Vector3{
     float x, y, z = 0;
 };
 
-void normalize(struct Vector *v)
+void normalize(struct Vector3 *v)
 {
     if(v->x != 0 || v->y != 0 || v->z != 0)
     {
@@ -26,7 +26,7 @@ void normalize(struct Vector *v)
     }
 }
 
-float vectorDistance(Vector *v1, Vector *v2){
+float vectorDistance(Vector3 *v1, Vector3 *v2){
     return (float)(sqrt(pow(v2->x - v1->x,2) + pow(v2->y - v1->y,2) + pow(v2->z - v1->z,2)));
 }
 #endif

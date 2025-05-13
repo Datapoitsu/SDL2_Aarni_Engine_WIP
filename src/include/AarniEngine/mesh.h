@@ -2,15 +2,16 @@
 #define _MESHH_
 #include <AarniEngine/vector.h>
 #include <AarniEngine/transform.h>
+#include <vector>
 
 struct Face
 {
-    int index[3];
+    Vector3 vertexes[3];
 };
 
-struct Mesh{
-    Vector *vertexes[0];
-    Face *faces[0];
+struct Mesh
+{
+    std::vector<Face> faces;
 };
-
+ 
 #endif

@@ -3,17 +3,17 @@
 
 #include <AarniEngine/vector.h>
 
+#define Transform_Empty {Vector_Zero,Vector_Zero,Vector_Zero}
+
 struct Transform
 {
-    Vector position;
-    Vector rotation;
-    Vector scale;
+    Vector3 position = Vector_Zero;
+    Vector3 rotation = Vector_Zero;
+    Vector3 scale = Vector_Zero;
 };
 
 void ResetObject(Transform *O){
-    O->position = Vector_Zero;
-    O->rotation = Vector_Zero;
-    O->scale = Vector_Zero;
+    *O = Transform_Empty;
 }
 
 #endif

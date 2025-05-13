@@ -177,10 +177,7 @@ void ReadConfig(Action a[]) //Sets the values to actions.
                     }
                 }
             }
-        }
-
-        
-        
+        }  
     }
 
     fclose(fptr); // Close the file

@@ -1,48 +1,52 @@
 #ifndef _ENGINEH_
 #define _ENGINEH_
 
+//Windows libraries.
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
 #include <windows.h>
+#include <vector>
 
+//SDL2 libraries
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+//My own libraries
 #include <AarniEngine/input.h>
 #include <AarniEngine/vector.h>
 #include <AarniEngine/sprite.h>
 #include <AarniEngine/transform.h>
 #include <AarniEngine/mesh.h>
+#include <AarniEngine/renderEngine.h>
+#include <AarniEngine/component.h>
+
+struct GameObject
+{
+    char name[32] = "";
+    Transform transform = Transform_Empty;
+    std::vector<Component> components;
+};
+
+std::vector<GameObject> hierarchy; //List of all gameobjects in the game
 
 //Function declaration
-void Update(float deltaTime);
 void Start();
-void createWindow();
+void Update(float deltaTime);
 void UpdateRendering();
 
-//Application variables
-SDL_Window *window;
-SDL_Renderer *renderer;
-const int width = 1000, heigth = 1000;
 bool endApp = false;
 
-// Time calculation
-timeval t1, t2;
+// ----- Time ----- //
+timeval t1, t2; //Time at start and end of the frame
 double elapsedTime;
 double deltaTime;
 int fpsLimiter = 60;
 
-struct GameObject{
-    char name[32];
-    Transform transform;
-    void *components[];
-};
-
 int main(int argc, char *argv[])
 {
-    createWindow();
-    if(window == NULL){
+    if(createWindow() == false)
+    {
         return 1;
     }
 
@@ -73,7 +77,7 @@ int main(int argc, char *argv[])
 
         UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
-        UpdateRendering();
+        renderFrame();
 
         //fps limiter
         Sleep(std::max(0.0,(1000 / fpsLimiter) - (deltaTime * 1000)));
@@ -86,39 +90,13 @@ int main(int argc, char *argv[])
         t1 = t2;
     }
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    closeWindow();
 
     return 1;
 }
 
-void createWindow()
-{
-    SDL_Init(SDL_INIT_EVERYTHING);
-    window = SDL_CreateWindow("SDL Practice",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width,heigth,SDL_WINDOW_ALLOW_HIGHDPI);
-
-    if (window != NULL)
-    {
-        renderer = SDL_CreateRenderer(window, -1, 0);
-    }
-    else
-    {
-        std::cout << "Could now create window: " << SDL_GetError() << std::endl;
-    }
-}
-
 void QuitApplication(){
     endApp = true;
-}
-
-void UpdateRendering()
-{
-    SDL_SetRenderDrawColor(renderer, 125, 125, 125, 255);
-    
-
-
-    SDL_RenderPresent(renderer);
-    SDL_RenderClear(renderer); //Clear afterwards
 }
 
 #endif

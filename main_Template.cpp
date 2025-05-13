@@ -1,4 +1,4 @@
-#include <AarniEngine/Engine.h>
+#include <AarniEngine/engine.h>
 
 void Start() //This function is called at the start of the app.
 {
