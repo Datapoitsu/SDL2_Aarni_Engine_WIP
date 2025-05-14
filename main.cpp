@@ -1,18 +1,13 @@
 #include <AarniEngine/engine.h>
 #include <AarniEngine/renderer.h>
-
+#include <AarniEngine/transform.h>
 void Start() //This function is called at the start of the app.
 {
-    Renderer R;
+    Renderer* r = new Renderer();
+    Transform* t = new Transform();
     hierarchy.push_back(
     {
         "Kuutio",
-        Transform_Empty,
-        {&R},
+        {t,r},
     });
-}
-
-void Update(float deltaTime) //This function is called every frame.
-{
-
 }

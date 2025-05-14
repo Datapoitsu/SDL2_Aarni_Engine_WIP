@@ -6,9 +6,10 @@
 class Component
 {
     public:
-    virtual void Start(){ std::cout << "Startti ei toimi!" << std::endl; };
-    virtual void Update(float deltaTime){ std::cout << "Update ei toimi!" << std::endl; };
-    virtual ~Component() = default;
+        virtual void Start(){};
+        virtual void Update(){};
+        virtual void Reset(){};
+        virtual ~Component() = default;
 };
 
 #endif

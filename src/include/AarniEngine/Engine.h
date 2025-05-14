@@ -24,7 +24,6 @@
 struct GameObject
 {
     char name[32] = "";
-    Transform transform = Transform_Empty;
     std::vector<Component*> components;
 };
 
@@ -32,8 +31,7 @@ std::vector<GameObject> hierarchy; //List of all gameobjects in the game
 
 //Function declaration
 void Start();
-void Update(float deltaTime);
-void UpdateRendering();
+void Update();
 
 bool endApp = false;
 
@@ -47,6 +45,7 @@ int main(int argc, char *argv[])
 {
     if(createWindow() == false)
     {
+        std::cout << "Window creation failed" << std::endl;
         return 1;
     }
 
@@ -58,6 +57,10 @@ int main(int argc, char *argv[])
         for(int componentIndex = 0; componentIndex < hierarchy[objectIndex].components.size(); componentIndex++)
         {
             hierarchy[objectIndex].components[componentIndex]->Start();
+            if(Transform* T = dynamic_cast<Transform*>(hierarchy[objectIndex].components[componentIndex]))
+            {
+                T->PrintData();
+            }
         }
     }
 
@@ -87,11 +90,9 @@ int main(int argc, char *argv[])
         {
             for(int componentIndex = 0; componentIndex < hierarchy[objectIndex].components.size(); componentIndex++)
             {
-                hierarchy[objectIndex].components[componentIndex]->Update(deltaTime);
+                hierarchy[objectIndex].components[componentIndex]->Update();
             }
         }
-
-        Update(deltaTime); //Write into updata function things that should repeat every frame.
 
         UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 

@@ -1,21 +1,19 @@
-#ifndef _RENDERERH_
-#define _RENDERERH_
+#ifndef _CUSTOMCOMPONENTH_
+#define _CUSTOMCOMPONENTH_
 
 #include <AarniEngine/component.h>
-#include <AarniEngine/mesh.h>
 
 class Renderer: public Component
 {
     public: 
-        Mesh mesh;
         void Start() override
         {
-            
+            std::cout << "Startti toimii!" << std::endl;
         }
 
         void Update() override
         {
-            
+            std::cout << "Update toimii!" << std::endl;
         }
 };
 
