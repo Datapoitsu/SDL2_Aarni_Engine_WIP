@@ -1,5 +1,5 @@
-#ifndef _RENDERERH_
-#define _RENDERERH_
+#ifndef _RENDERENGINE_
+#define _RENDERENGINE_
 
 #include <SDL2/SDL.h>
 #include <stdlib.h>
@@ -20,13 +20,12 @@ bool createWindow()
     }
     else
     {
-        //Error, mutta miksi?
-        //std::cout << "Could now create window: " << SDL_GetError() << std::endl;
+        std::cout << "Could now create window: " << SDL_GetError() << std::endl;
     }
     return window != NULL;
 }
 
-bool closeWindow()
+void closeWindow()
 {
     SDL_DestroyWindow(window);
     SDL_Quit();

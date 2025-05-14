@@ -15,17 +15,17 @@
 //My own libraries
 #include <AarniEngine/input.h>
 #include <AarniEngine/vector.h>
-#include <AarniEngine/sprite.h>
 #include <AarniEngine/transform.h>
 #include <AarniEngine/mesh.h>
 #include <AarniEngine/renderEngine.h>
 #include <AarniEngine/component.h>
+#include <AarniEngine/renderer.h>
 
 struct GameObject
 {
     char name[32] = "";
     Transform transform = Transform_Empty;
-    std::vector<Component> components;
+    std::vector<Component*> components;
 };
 
 std::vector<GameObject> hierarchy; //List of all gameobjects in the game
@@ -52,6 +52,15 @@ int main(int argc, char *argv[])
 
     Start();
 
+    //Calls update on all components
+    for(int objectIndex = 0; objectIndex < hierarchy.size(); objectIndex++)
+    {
+        for(int componentIndex = 0; componentIndex < hierarchy[objectIndex].components.size(); componentIndex++)
+        {
+            hierarchy[objectIndex].components[componentIndex]->Start();
+        }
+    }
+
     //Begining of calculating time.
     mingw_gettimeofday(&t1, NULL); 
 
@@ -72,6 +81,15 @@ int main(int argc, char *argv[])
         }
 
         UpdateInputs(Event);
+
+        //Calls Update function on all components
+        for(int objectIndex = 0; objectIndex < hierarchy.size(); objectIndex++)
+        {
+            for(int componentIndex = 0; componentIndex < hierarchy[objectIndex].components.size(); componentIndex++)
+            {
+                hierarchy[objectIndex].components[componentIndex]->Update(deltaTime);
+            }
+        }
 
         Update(deltaTime); //Write into updata function things that should repeat every frame.
 
