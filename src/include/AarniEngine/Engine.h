@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
     }
 
     Start();
-
+    StartVectorTest();
     //Calls update on all components
     for(int objectIndex = 0; objectIndex < hierarchy.size(); objectIndex++)
     {
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
             hierarchy[objectIndex].components[componentIndex]->Start();
             if(Transform* T = dynamic_cast<Transform*>(hierarchy[objectIndex].components[componentIndex]))
             {
-                T->PrintData();
+                //T->PrintData();
             }
         }
     }
