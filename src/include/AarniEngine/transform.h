@@ -1,6 +1,8 @@
 #ifndef _TRANSFORMH_
 #define _TRANSFORMH_
 
+#include <iostream>
+
 #include <AarniEngine/vector.h>
 #include <AarniEngine/component.h>
 
@@ -18,11 +20,12 @@ class Transform: public Component
             scale = Vector_One;
         }
 
-        void PrintData()
-        {
-            std::cout << "Position X:" << position.x << " Y:" << position.y << " Z:" << position.z << std::endl;
-            std::cout << "Rotation X:" << rotation.x << " Y:" << rotation.y << " Z:" << rotation.z << std::endl;
-            std::cout << "Scale X:" << scale.x << " Y:" << scale.y << " Z:" << scale.z << std::endl;
-        }
+        friend std::ostream& operator<<(std::ostream& os, const Transform& pt); //overriding << operator
 };
+
+std::ostream& operator<<(std::ostream& os, const Transform& t) // overriding << operator
+{
+    os << "Position: " << t.position << " Rotation: " << t.rotation << " Scale: " << t.scale;
+    return os;
+}
 #endif

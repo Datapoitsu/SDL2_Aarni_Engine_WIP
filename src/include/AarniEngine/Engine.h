@@ -8,10 +8,6 @@
 #include <windows.h>
 #include <vector>
 
-//SDL2 libraries
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
 //My own libraries
 #include <AarniEngine/input.h>
 #include <AarniEngine/vector.h>
@@ -45,12 +41,10 @@ int main(int argc, char *argv[])
 {
     if(createWindow() == false)
     {
-        std::cout << "Window creation failed" << std::endl;
         return 1;
     }
 
     Start();
-    StartVectorTest();
     //Calls update on all components
     for(int objectIndex = 0; objectIndex < hierarchy.size(); objectIndex++)
     {
@@ -59,7 +53,7 @@ int main(int argc, char *argv[])
             hierarchy[objectIndex].components[componentIndex]->Start();
             if(Transform* T = dynamic_cast<Transform*>(hierarchy[objectIndex].components[componentIndex]))
             {
-                //T->PrintData();
+                std::cout << *T << std::endl;
             }
         }
     }
@@ -110,7 +104,6 @@ int main(int argc, char *argv[])
     }
 
     closeWindow();
-
     return 1;
 }
 

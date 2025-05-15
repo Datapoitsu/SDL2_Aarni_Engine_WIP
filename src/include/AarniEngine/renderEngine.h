@@ -13,14 +13,13 @@ bool createWindow()
 {
     SDL_Init(SDL_INIT_EVERYTHING);
     window = SDL_CreateWindow("SDL Practice",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,width,heigth,SDL_WINDOW_ALLOW_HIGHDPI);
-
     if (window != NULL)
     {
         renderer = SDL_CreateRenderer(window, -1, 0);
     }
     else
     {
-        std::cout << "Could now create window: " << SDL_GetError() << std::endl;
+        std::cout << "Could not create window: " << SDL_GetError() << std::endl;
     }
     return window != NULL;
 }
