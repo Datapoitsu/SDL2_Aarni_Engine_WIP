@@ -54,18 +54,35 @@ struct Vector3{
         return Vector_Zero;
     }
 
-    static Vector3 ClampMagnitude(Vector3 v1, float maxDistance) //Distance limited vector
+    static Vector3 ClampMagnitude(Vector3 v1, float maxDistance)
     {
-        if (Magnitude(v1) < maxDistance)
+        return ClampMagnitude(v1,0,maxDistance);
+    }
+
+    static Vector3 ClampMagnitude(Vector3 v1, float minDistance, float maxDistance) //Distance limited vector
+    {
+        if (Magnitude(v1) < minDistance)
         {
-            return v1;
+            return Normalize(v1) * minDistance;
         }
-        return Normalize(v1) * maxDistance;
+        if(Magnitude(v1) > maxDistance)
+        {
+            return Normalize(v1) * maxDistance;
+        }
+        return v1;
     }
 
     static float Angle(Vector3 v1, Vector3 v2)
     {
-        return asin(Distance(v1,v2) / Magnitude(v2));
+        float aSquared = MagnitudeSquared(v1);
+        float bSquared = MagnitudeSquared(v2);
+        float cSquared = DistanceSquared(v1,v2);
+        float a = sqrt(aSquared);
+        float b = sqrt(bSquared);
+        float c = sqrt(cSquared);
+        std::cout << aSquared << "; " << bSquared << "; " << cSquared << std::endl;
+        std::cout << a << "; " << b << "; " << c << std::endl;
+        return acosf((aSquared + bSquared - cSquared) / (2 * sqrt(aSquared) * sqrt(bSquared))) * 180 / 3.14159;
     }
 
     static Vector3 Lerp(Vector3 v1, Vector3 v2, float position) //returns the vector where t = 0 is v1 and t = 1 is v2.
@@ -215,6 +232,13 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v1) // overriding << o
 {
     os << "(" << v1.x << ", " << v1.y << ", " << v1.z << ")";
     return os;
+}
+
+void TestVector()
+{
+    Vector3 v1 = {2,0,0};
+    Vector3 v2 = {4,4,0};
+    std::cout << Vector3::Angle(v1,v2) << std::endl;
 }
 
 #endif
