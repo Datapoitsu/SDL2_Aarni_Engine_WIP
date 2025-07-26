@@ -3,9 +3,9 @@
 
 #include <AarniEngine/component.h>
 
-class Renderer: public Component
+class CustomComponent: public Component
 {
-    public: 
+    public:
         void Start() override
         {
             std::cout << "Startti toimii!" << std::endl;

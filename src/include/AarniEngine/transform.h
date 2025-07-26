@@ -9,15 +9,32 @@
 class Transform: public Component
 {
     public:
+        enum ComponentType componentType = transform;
+
         Vector3 position = Vector_Zero;
         Vector3 rotation = Vector_Zero;
         Vector3 scale = Vector_One;
 
         void Reset() override
         {
+            ResetPosition();
+            ResetRotation();
+            ResetScale();
+        }
+
+        void ResetPosition()
+        {
             position = Vector_Zero;
+        }
+
+        void ResetRotation()
+        {
             rotation = Vector_Zero;
-            scale = Vector_One;
+        }
+
+        void ResetScale()
+        {
+            scale = Vector_Zero;
         }
 
         friend std::ostream& operator<<(std::ostream& os, const Transform& pt); //overriding << operator

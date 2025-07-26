@@ -7,6 +7,7 @@ TODO:
     Project()
     ProjectOnPlane()
     RotateTowards()
+    Angle()
 */
 
 #include <math.h>
@@ -72,19 +73,6 @@ struct Vector3{
         return v1;
     }
 
-    static float Angle(Vector3 v1, Vector3 v2)
-    {
-        float aSquared = MagnitudeSquared(v1);
-        float bSquared = MagnitudeSquared(v2);
-        float cSquared = DistanceSquared(v1,v2);
-        float a = sqrt(aSquared);
-        float b = sqrt(bSquared);
-        float c = sqrt(cSquared);
-        std::cout << aSquared << "; " << bSquared << "; " << cSquared << std::endl;
-        std::cout << a << "; " << b << "; " << c << std::endl;
-        return acosf((aSquared + bSquared - cSquared) / (2 * sqrt(aSquared) * sqrt(bSquared))) * 180 / 3.14159;
-    }
-
     static Vector3 Lerp(Vector3 v1, Vector3 v2, float position) //returns the vector where t = 0 is v1 and t = 1 is v2.
     {
         return v1 + (v2 - v1) * position;
@@ -134,12 +122,12 @@ struct Vector3{
         return {v.x == 0.0f ? 0.0f : v.x > 0.0f ? 1.0f : -1.0f, v.y == 0.0f ? 0.0f : v.y > 0.0f ? 1.0f : -1.0f, v.z == 0.0f ? 0.0f : v.z > 0.0f ? 1.0f : -1.0f};
     }
     
-    static Vector3 Max(Vector3 v1, Vector3 v2)
+    static Vector3 Max(Vector3 v1, Vector3 v2) //Returns the greatest value of xyz.
     {
         return {std::max(v1.x,v2.x), std::max(v1.y,v2.y), std::max(v1.z,v2.z)};
     }
 
-    static Vector3 Min(Vector3 v1, Vector3 v2)
+    static Vector3 Min(Vector3 v1, Vector3 v2) //Returns the smallest value of xyz.
     {
         return {std::min(v1.x,v2.x), std::min(v1.y,v2.y), std::min(v1.z,v2.z)};
     }
@@ -155,6 +143,7 @@ struct Vector3{
     }
 
     // -------------------- Overriding operators -------------------- //
+
     // ----- plus ----- //
     Vector3& operator+=(const Vector3& other)
     {
@@ -233,12 +222,4 @@ std::ostream& operator<<(std::ostream& os, const Vector3& v1) // overriding << o
     os << "(" << v1.x << ", " << v1.y << ", " << v1.z << ")";
     return os;
 }
-
-void TestVector()
-{
-    Vector3 v1 = {2,0,0};
-    Vector3 v2 = {4,4,0};
-    std::cout << Vector3::Angle(v1,v2) << std::endl;
-}
-
 #endif

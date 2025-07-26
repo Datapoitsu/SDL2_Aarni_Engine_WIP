@@ -17,13 +17,7 @@
 #include <AarniEngine/component.h>
 #include <AarniEngine/renderer.h>
 
-struct GameObject
-{
-    char name[32] = "";
-    std::vector<Component*> components;
-};
-
-std::vector<GameObject> hierarchy; //List of all gameobjects in the game
+Component *Root = new Component(); //Root object. Every thing will be built on top of this. Components consists an array of child components.
 
 //Function declaration
 void Start();
@@ -43,19 +37,13 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-    TestVector();
     Start();
     //Calls update on all components
-    for(int objectIndex = 0; objectIndex < hierarchy.size(); objectIndex++)
+    Root->Start();
+    for(int i = 0; i < Root->childCount; i++)
     {
-        for(int componentIndex = 0; componentIndex < hierarchy[objectIndex].components.size(); componentIndex++)
-        {
-            hierarchy[objectIndex].components[componentIndex]->Start();
-            if(Transform* T = dynamic_cast<Transform*>(hierarchy[objectIndex].components[componentIndex]))
-            {
-                //std::cout << *T << std::endl;
-            }
-        }
+        Root->children[i]->Start();
+        Root->children[i]->StartChildren();
     }
 
     //Begining of calculating time.
@@ -80,12 +68,10 @@ int main(int argc, char *argv[])
         UpdateInputs(Event);
 
         //Calls Update function on all components
-        for(int objectIndex = 0; objectIndex < hierarchy.size(); objectIndex++)
+        for(int i = 0; i < Root->childCount; i++)
         {
-            for(int componentIndex = 0; componentIndex < hierarchy[objectIndex].components.size(); componentIndex++)
-            {
-                hierarchy[objectIndex].components[componentIndex]->Update();
-            }
+            Root->children[i]->Update();
+            Root->children[i]->UpdateChildren();
         }
 
         UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
