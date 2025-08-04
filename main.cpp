@@ -1,18 +1,20 @@
 #include <AarniEngine/engine.h>
-#include <AarniEngine/renderer.h>
-#include <AarniEngine/transform.h>
 
 void Start() //This function is called at the start of the app.
 {
-    Root->AddChild((*new Component()));
-    Root->children[0]->AddChild((*new Transform()));
-    Root->children[0]->AddChild((*new Renderer()));
-    dynamic_cast<Renderer*>(Root->children[0]->children[1])->mesh = Mesh::LoadModel("src/Game/Models/Cube.obj");
-    dynamic_cast<Renderer*>(Root->children[0]->children[1])->mesh.PrintMeshData();
-    std::cout << Root->children[0]->componentType << std::endl;
+    //Play ball
+    root->AddChild((*new Transform())); //Ball 1
+    dynamic_cast<Transform*>(root->children[0])->position = {512 + ((rand() % 2) * 2 - 1) * (50 + rand() % 200),250, 512 + ((rand() % 2) * 2 - 1) * (50 + rand() % 200)};
+    root->children[0]->AddChild(*new Ball());
+    dynamic_cast<Ball*>(root->children[0]->children[0])->velocity = {((rand() % 2) * 2 - 1) * (10 + rand() % 15),0, ((rand() % 2) * 2 - 1) * (10 + rand() % 15)};
+    
+    root->AddChild((*new Transform())); //Ball 2
+    dynamic_cast<Transform*>(root->children[1])->position = {512 +((rand() % 2) * 2 - 1) * (50 + rand() % 200),250, 512 + ((rand() % 2) * 2 - 1) * (50 + rand() % 200)};
+    root->children[1]->AddChild(*new Ball());
+    dynamic_cast<Ball*>(root->children[1]->children[0])->velocity = {((rand() % 2) * 2 - 1) * (10 + rand() % 15),0, ((rand() % 2) * 2 - 1) * (10 + rand() % 15)};
 }
 
 void Update() //This function is called at every frame.
 {
-    
+
 }

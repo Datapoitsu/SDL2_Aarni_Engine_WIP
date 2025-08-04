@@ -2,7 +2,6 @@
 #define _MESHH_
 #include <AarniEngine/vector.h>
 #include <AarniEngine/transform.h>
-#include <vector>
 
 #include <iostream>
 #include <fstream>
@@ -23,7 +22,7 @@ struct Mesh
     static Mesh LoadModel(std::string filename)
     {
         Mesh m = {};
-
+        
         // # ----- Quick counting ----- # //
         std::string rowText;
         int vertexMaxCount = 0;
@@ -34,7 +33,7 @@ struct Mesh
         {
             char arr[rowText.length() + 1]; //char arr version of the string.
             strcpy(arr, rowText.c_str());
-
+            
             char* rowType = strtok(arr, " ");
             if(strcmp(rowType,"v") == 0)
             {
@@ -45,14 +44,14 @@ struct Mesh
                 faceMaxCount++;
             }
         }
-
+        
         m.vertexCount = vertexMaxCount;
         m.faceCount = faceMaxCount;
-
+        
         //Allocating memory.
         m.vertexes = (Vector3(*)[]) malloc(vertexMaxCount * sizeof(Vector3));
         m.faces = (Face(*)[]) malloc(faceMaxCount * sizeof(Face));
-
+        
         int vertexIndex = 0;
         int faceIndex = 0;
         
@@ -83,7 +82,7 @@ struct Mesh
         MyReadFile.close();
         return m;
     }
-
+    
     void PrintMeshData()
     {
         std::cout << "Data of the mesh:" << std::endl;

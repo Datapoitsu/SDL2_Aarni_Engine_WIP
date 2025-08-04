@@ -1,0 +1,30 @@
+#ifndef _BALLH_
+#define _BALLH_
+
+#include <AarniEngine/component.h>
+
+class Ball: public Component
+{
+    public:
+        Vector3 velocity = {0,0,0};
+        float radius = 25.0f;
+        SDL_Color color = {255,255,0};
+
+        void Start() override
+        {
+            componentType = ball;
+        }
+
+        void Update(double deltaTime) override
+        {
+            velocity.y -= 9.81;
+            dynamic_cast<Transform*>(parent)->position += velocity * deltaTime;
+            if(dynamic_cast<Transform*>(parent)->position.y < 0)
+            {
+                velocity.y *= -1;
+                dynamic_cast<Transform*>(parent)->position.y *= -1;
+            }
+        }
+};
+
+#endif
