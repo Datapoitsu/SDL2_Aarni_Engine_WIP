@@ -133,7 +133,7 @@ void DrawBallsRecusive(Component *c, Transform *t)
     }
     else if(c->componentType == ball)
     {
-        DrawCircle(t->position.x, screenHeigth -150 -t->position.y -t->position.z / 2,dynamic_cast<Ball*>(c)->radius,dynamic_cast<Ball*>(c)->color);
+        DrawCircle(t->position.x, screenHeigth -50 -t->position.y -t->position.z / 2,dynamic_cast<Ball*>(c)->radius,dynamic_cast<Ball*>(c)->color);
     }
     for(int i = 0; i < c->childCount; i++)
     {

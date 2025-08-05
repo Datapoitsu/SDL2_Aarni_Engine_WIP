@@ -8,7 +8,7 @@ class Ball: public Component
     public:
         Vector3 velocity = {0,0,0};
         float radius = 25.0f;
-        SDL_Color color = {255,255,0};
+        SDL_Color color = {-256 + rand() % 512, -256 + rand() % 512, -256 + rand() % 512};
 
         void Start() override
         {
@@ -21,7 +21,7 @@ class Ball: public Component
             dynamic_cast<Transform*>(parent)->position += velocity * deltaTime;
             if(dynamic_cast<Transform*>(parent)->position.y < 0)
             {
-                velocity.y *= -1;
+                velocity.y *= -0.9f;
                 dynamic_cast<Transform*>(parent)->position.y *= -1;
             }
         }
