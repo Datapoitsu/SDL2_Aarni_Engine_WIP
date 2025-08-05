@@ -19,60 +19,37 @@ struct Action //Action is something that you would see in binding settings as an
 
 Action actions[] = {
     {
-        {"Up"},
+        {"Up1"},
         {
             {
                 {SDLK_w,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
+            }
+        }
+    },
+    {
+        {"Down1"},
+        {
+            {
+                {SDLK_s,SDLK_UNKNOWN,SDLK_UNKNOWN},
+            }
+        }
+    },
+    {
+        {"Up2"},
+        {
             {
                 {SDLK_UP,SDLK_UNKNOWN,SDLK_UNKNOWN},
             }
         }
     },
     {
-        {"Down"},
+        {"Down2"},
         {
-            {
-                {SDLK_s,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
             {
                 {SDLK_DOWN,SDLK_UNKNOWN,SDLK_UNKNOWN},
             }
         }
     },
-    {
-        {"Left"},
-        {
-            {
-                {SDLK_a,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
-            {
-                {SDLK_LEFT,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    },
-    {
-        {"Right"},
-        {
-            {
-                {SDLK_d,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
-            {
-                {SDLK_RIGHT,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    },
-    {
-        {"Activate"},
-        {
-            {
-                {SDLK_e,SDLK_r,SDLK_q},
-            },
-            {
-                {SDLK_UNKNOWN,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    }
 };
 
 void UnbindAll(Action a[]) //

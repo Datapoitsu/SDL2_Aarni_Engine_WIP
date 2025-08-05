@@ -7,8 +7,10 @@ enum ComponentType {
     empty,
     transform,
     renderer,
+    renderer2d,
     camera,
     ball,
+    player,
 };
 
 class Component

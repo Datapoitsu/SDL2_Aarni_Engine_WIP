@@ -2,6 +2,7 @@
 #define _RENDERENGINE_
 
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_render.h>
 #include <AarniEngine/component.h>
 #include <AarniEngine/ball.h>
 
@@ -11,7 +12,7 @@ SDL_Renderer *RenderInformation;
 const int screenWidth = 1000;
 const int screenHeigth = 1000;
 int backgroundColour[3] = {125,125,125};
-void DrawBallsRecusive(Component *c, Transform *t);
+void DrawRecursive(Component *c, Transform *t);
 bool createWindow()
 {
     SDL_Init(SDL_INIT_EVERYTHING);
@@ -70,42 +71,16 @@ void DrawCircle(int posX, int posY, float radius, SDL_Color color)
     }
 }
 
+
 void renderFrame(Component *root)
 {
     // ----- Draw background ----- //
     SDL_SetRenderDrawColor(RenderInformation, backgroundColour[0], backgroundColour[1], backgroundColour[2], 255);
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
 
-    // ----- Triangle ----- //
-    SDL_Texture *texture = IMG_LoadTexture(RenderInformation,"src/Game/Sprites/BrickWall.png");
-    
-    SDL_Vertex vertex_1 = {{0,screenHeigth / 4}, {255,255,255}, {0, 0}}; //Center vertex
-    SDL_Vertex vertex_2 = {{screenWidth / 2, 0},{255,255,255}, {1, 0}};
-    SDL_Vertex vertex_3 = {{screenWidth / 2, screenHeigth / 2},{255,255,255}, {1, 1}};
-    SDL_Vertex vertices[] = {vertex_1,vertex_2,vertex_3};
-    DrawTriangle(vertices, texture);
-    
-    SDL_Vertex vertex_4 = {{0,screenHeigth / 4}, {255,255,255}, {0, 0}}; //Center vertex
-    SDL_Vertex vertex_5 = {{screenWidth / 2, screenHeigth / 2},{255,255,255}, {1, 1}};
-    SDL_Vertex vertex_6 = {{0,screenHeigth / 4 * 3},{255,255,255}, {0, 1}};
-    SDL_Vertex vertices2[] = {vertex_4,vertex_5,vertex_6};
-    DrawTriangle(vertices2, texture);
-
-    SDL_Vertex vertex_7 = {{screenWidth,screenHeigth / 4}, {255,255,255}, {1, 0}}; //Center vertex
-    SDL_Vertex vertex_8 = {{screenWidth / 2, 0},{255,255,255}, {0, 0}};
-    SDL_Vertex vertex_9 = {{screenWidth / 2, screenHeigth / 2},{255,255,255}, {0, 1}};
-    SDL_Vertex vertices3[] = {vertex_7,vertex_8,vertex_9};
-    DrawTriangle(vertices3, texture);
-    
-    SDL_Vertex vertex_10 = {{screenWidth,screenHeigth / 4}, {255,255,255}, {1, 0}}; //Center vertex
-    SDL_Vertex vertex_11 = {{screenWidth / 2, screenHeigth / 2},{255,255,255}, {0, 1}};
-    SDL_Vertex vertex_12 = {{screenWidth,screenHeigth / 4 * 3},{255,255,255}, {1, 1}};
-    SDL_Vertex vertices4[] = {vertex_10,vertex_11,vertex_12};
-    DrawTriangle(vertices4, texture);
-
     // ----- Circle ----- //
     Transform *t1 = new Transform();
-    DrawBallsRecusive(root, t1);
+    DrawRecursive(root, t1);
     
     SDL_RenderPresent(RenderInformation); //Draws things.
 
@@ -125,11 +100,96 @@ void renderFrame(Component *root)
     */
 }
 
-void DrawBallsRecusive(Component *c, Transform *t)
+// ----- Anchoring ----- //
+void offsetAnchor(SDL_Rect *r, Renderer2D::AnchorPosition anchor)
+{
+    //Top left anchor is the default.
+    if(anchor == Renderer2D::AnchorPosition::topLeft)
+    {
+        return;
+    }
+    //Right side move.
+    if(     anchor == Renderer2D::AnchorPosition::topRight
+        ||  anchor == Renderer2D::AnchorPosition::middleRight
+        ||  anchor == Renderer2D::AnchorPosition::bottomRight
+    )
+    {
+        r->x -= r->w;
+    }
+    else //Center horizontal move.
+    if(     anchor == Renderer2D::AnchorPosition::topCenter
+        ||  anchor == Renderer2D::AnchorPosition::middleCenter
+        ||  anchor == Renderer2D::AnchorPosition::bottomCenter
+    )
+    {
+        r->x -= (int)(r->w / 2);
+    }
+    //Bottom side move.
+    if( anchor == Renderer2D::AnchorPosition::bottomLeft
+        ||  anchor == Renderer2D::AnchorPosition::bottomCenter
+        ||  anchor == Renderer2D::AnchorPosition::bottomRight
+    )
+    {
+        r->y -= r->h;
+    }
+    else //Middle vertical move.
+    if(     anchor == Renderer2D::AnchorPosition::middleLeft
+        ||  anchor == Renderer2D::AnchorPosition::middleCenter
+        ||  anchor == Renderer2D::AnchorPosition::middleRight
+    )
+    {
+        r->y -= (int)(r->h / 2);
+    }
+}
+
+void flippingRenderer(Renderer2D *r, SDL_RendererFlip *rf, double *angle)
+{
+    if(r->flipX && r->flipY)
+    {
+        *angle += 180;
+        return;
+    }
+    else
+    {
+        if(r->flipX)
+        {
+            *rf = SDL_RendererFlip::SDL_FLIP_HORIZONTAL;
+        }
+        else if(r->flipY)
+        {
+            *rf = SDL_RendererFlip::SDL_FLIP_VERTICAL;
+        }
+    }
+}
+
+void DrawSprite(Renderer2D renderer2d, Transform *t)
+{
+    SDL_Rect destination;
+    destination.x = t->position.x;
+    destination.y = t->position.y;
+    SDL_QueryTexture(renderer2d.sprite,NULL,NULL,&destination.w,&destination.h);
+    destination.w *= t->scale.x;
+    destination.h *= t->scale.y;
+    offsetAnchor(&destination, renderer2d.anchor);
+    
+    SDL_SetTextureColorMod(renderer2d.sprite,renderer2d.colour.r,renderer2d.colour.g,renderer2d.colour.b);
+
+    SDL_RendererFlip flipping = SDL_RendererFlip::SDL_FLIP_NONE;
+    double angle = 0;
+    flippingRenderer(&renderer2d, &flipping, &angle);
+
+    SDL_RenderCopyEx(RenderInformation, renderer2d.sprite, NULL, &destination, angle, NULL, flipping);
+}
+
+void DrawRecursive(Component *c, Transform *t)
 {
     if(c->componentType == transform)
     {
         *t += *dynamic_cast<Transform*>(c);
+    }
+    else if(c->componentType == renderer2d)
+    {
+        DrawSprite(*dynamic_cast<Renderer2D*>(c), t);
     }
     else if(c->componentType == ball)
     {
@@ -139,7 +199,7 @@ void DrawBallsRecusive(Component *c, Transform *t)
     {
         Transform *t2 = new Transform();
         *t2 += *t;
-        DrawBallsRecusive(c->children[i], t2);
+        DrawRecursive(c->children[i], t2);
     }
 }
 

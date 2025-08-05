@@ -10,6 +10,7 @@
 
 //SDL2
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 
 
 //My own libraries
@@ -21,8 +22,10 @@
 
 #include <AarniEngine/transform.h>
 #include <AarniEngine/renderer.h>
+#include <AarniEngine/renderer2D.h>
 #include <AarniEngine/camera.h>
 #include <AarniEngine/ball.h>
+#include <AarniEngine/player.h>
 
 Component *root = new Component(); //root object. Every thing will be built on top of this. Components consists an array of child components.
 
