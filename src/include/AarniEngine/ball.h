@@ -8,7 +8,7 @@ class Ball: public Component
     public:
         Vector3 velocity = {0,0,0};
         float radius = 25.0f;
-        SDL_Color color = {-256 + rand() % 512, -256 + rand() % 512, -256 + rand() % 512};
+        SDL_Color color = {(Uint8)(rand() % 256), (Uint8)(rand() % 256), (Uint8)(rand() % 256)};
 
         void Start() override
         {

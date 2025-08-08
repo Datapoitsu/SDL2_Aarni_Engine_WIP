@@ -22,11 +22,13 @@
 #include <AarniEngine/transform.h>
 #include <AarniEngine/renderer.h>
 #include <AarniEngine/camera.h>
+#include <AarniEngine/circleCollider.h>
 #include <AarniEngine/ball.h>
 
 Component *root = new Component(); //root object. Every thing will be built on top of this. Components consists an array of child components.
 
 #include <AarniEngine/renderEngine.h>
+#include <AarniEngine/physicsEngine.h>
 #include <AarniEngine/mesh.h>
 
 
@@ -85,7 +87,8 @@ int main(int argc, char *argv[])
 
         UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
-        renderFrame(root);
+        PhysicsEngine();
+        //renderFrame(root);
 
         //fps limiter
         Sleep(std::max(0.0,(1000 / fpsLimiter) - (deltaTime * 1000)));

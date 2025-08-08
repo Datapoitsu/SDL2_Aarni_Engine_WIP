@@ -77,6 +77,7 @@ void renderFrame(Component *root)
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
 
     // ----- Triangle ----- //
+    /*
     SDL_Texture *texture = IMG_LoadTexture(RenderInformation,"src/Game/Sprites/BrickWall.png");
     
     SDL_Vertex vertex_1 = {{0,screenHeigth / 4}, {255,255,255}, {0, 0}}; //Center vertex
@@ -102,7 +103,7 @@ void renderFrame(Component *root)
     SDL_Vertex vertex_12 = {{screenWidth,screenHeigth / 4 * 3},{255,255,255}, {1, 1}};
     SDL_Vertex vertices4[] = {vertex_10,vertex_11,vertex_12};
     DrawTriangle(vertices4, texture);
-
+    */
     // ----- Circle ----- //
     Transform *t1 = new Transform();
     DrawBallsRecusive(root, t1);

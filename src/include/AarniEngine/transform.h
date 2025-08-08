@@ -9,9 +9,9 @@
 class Transform: public Component
 {
     public:
-        Vector3 position = Vector_Zero;
-        Vector3 rotation = Vector_Zero;
-        Vector3 scale = Vector_One;
+        Vector3 position = Vector3::Zero();
+        Vector3 rotation = Vector3::Zero();
+        Vector3 scale = Vector3::Zero();
 
         void Start()
         {
@@ -27,17 +27,17 @@ class Transform: public Component
 
         void ResetPosition()
         {
-            position = Vector_Zero;
+            position = Vector3::Zero();
         }
 
         void ResetRotation()
         {
-            rotation = Vector_Zero;
+            rotation = Vector3::Zero();
         }
 
         void ResetScale()
         {
-            scale = Vector_Zero;
+            scale = Vector3::Zero();
         }
 
         //Adding transforms.

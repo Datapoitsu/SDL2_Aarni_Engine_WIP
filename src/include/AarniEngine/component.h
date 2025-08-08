@@ -8,6 +8,7 @@ enum ComponentType {
     transform,
     renderer,
     camera,
+    circleCollider2D,
     ball,
 };
 

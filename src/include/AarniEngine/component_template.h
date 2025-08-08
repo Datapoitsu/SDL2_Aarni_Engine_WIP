@@ -5,16 +5,15 @@
 
 class CustomComponent: public Component
 {
-    enum ComponentType componentType = empty;
     public:
         void Start() override
         {
-            std::cout << "Startti toimii!" << std::endl;
+            //enum ComponentType componentType = customtype;
         }
 
         void Update(double deltaTime) override
         {
-            std::cout << "Update toimii!" << std::endl;
+
         }
 };
 
