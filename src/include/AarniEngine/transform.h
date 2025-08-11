@@ -5,12 +5,13 @@
 
 #include <AarniEngine/vector.h>
 #include <AarniEngine/component.h>
+#include <AarniEngine/quaternion.h>
 
 class Transform: public Component
 {
     public:
         Vector3 position = Vector3::Zero();
-        Vector3 rotation = Vector3::Zero();
+        Quaternion rotation = Quaternion::Zero();
         Vector3 scale = Vector3::Zero();
 
         void Start()
@@ -32,7 +33,7 @@ class Transform: public Component
 
         void ResetRotation()
         {
-            rotation = Vector3::Zero();
+            rotation = Quaternion::Zero();
         }
 
         void ResetScale()

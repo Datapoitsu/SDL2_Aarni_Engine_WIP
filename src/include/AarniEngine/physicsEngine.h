@@ -49,7 +49,6 @@ void CalculateCollisions()
                     dynamic_cast<CircleCollider*>(physicsComponents[k])->OnCollisionEnter();
                 }
             }
-            
         }
     }
 }

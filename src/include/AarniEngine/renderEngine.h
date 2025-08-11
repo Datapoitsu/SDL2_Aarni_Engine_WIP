@@ -47,6 +47,7 @@ void DrawTriangle(SDL_Vertex vertices[], SDL_Texture *texture = NULL)
 
 void DrawCircle(int posX, int posY, float radius, SDL_Color color)
 {
+    
     SDL_SetRenderDrawColor(RenderInformation,color.r, color.g, color.b, color.a);
     if(radius <= 0){ return; }
     if(radius == 1) //Edge case where the other part of the code isn't able to draw a circle with a radius of one.
@@ -76,6 +77,8 @@ void renderFrame(Component *root)
     SDL_SetRenderDrawColor(RenderInformation, backgroundColour[0], backgroundColour[1], backgroundColour[2], 255);
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
 
+    SDL_SetRenderDrawColor(RenderInformation,125,0,0,255);
+    //SDL_RenderDrawLine(RenderInformation,400,400,500,450);
     // ----- Triangle ----- //
     /*
     SDL_Texture *texture = IMG_LoadTexture(RenderInformation,"src/Game/Sprites/BrickWall.png");

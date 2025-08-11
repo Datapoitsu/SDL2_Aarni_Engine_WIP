@@ -15,6 +15,7 @@
 //My own libraries
 #include <AarniEngine/input.h>
 #include <AarniEngine/vector.h>
+#include <AarniEngine/quaternion.h>
 #include <AarniEngine/mat4x4.h>
 
 #include <AarniEngine/component.h>
@@ -87,8 +88,8 @@ int main(int argc, char *argv[])
 
         UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
-        PhysicsEngine();
-        //renderFrame(root);
+        //PhysicsEngine();
+        renderFrame(root);
 
         //fps limiter
         Sleep(std::max(0.0,(1000 / fpsLimiter) - (deltaTime * 1000)));
