@@ -32,7 +32,6 @@ Component *root = new Component(); //root object. Every thing will be built on t
 #include <AarniEngine/physicsEngine.h>
 #include <AarniEngine/mesh.h>
 
-
 //Function declaration
 void Start();
 void Update();
@@ -54,6 +53,9 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
+    // ----- Testautomation ----- //
+    TestVectors();
+
     Start();
     //Calls update on all components
     root->Start();

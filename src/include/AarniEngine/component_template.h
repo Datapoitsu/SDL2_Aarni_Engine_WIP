@@ -9,6 +9,7 @@ class CustomComponent: public Component
         void Start() override
         {
             //enum ComponentType componentType = customtype;
+            //Remember to add the custom type to component.h !!!
         }
 
         void Update(double deltaTime) override

@@ -47,7 +47,6 @@ void DrawTriangle(SDL_Vertex vertices[], SDL_Texture *texture = NULL)
 
 void DrawCircle(int posX, int posY, float radius, SDL_Color color)
 {
-    
     SDL_SetRenderDrawColor(RenderInformation,color.r, color.g, color.b, color.a);
     if(radius <= 0){ return; }
     if(radius == 1) //Edge case where the other part of the code isn't able to draw a circle with a radius of one.
@@ -80,7 +79,7 @@ void renderFrame(Component *root)
     SDL_SetRenderDrawColor(RenderInformation,125,0,0,255);
     //SDL_RenderDrawLine(RenderInformation,400,400,500,450);
     // ----- Triangle ----- //
-    /*
+    
     SDL_Texture *texture = IMG_LoadTexture(RenderInformation,"src/Game/Sprites/BrickWall.png");
     
     SDL_Vertex vertex_1 = {{0,screenHeigth / 4}, {255,255,255}, {0, 0}}; //Center vertex
@@ -106,7 +105,7 @@ void renderFrame(Component *root)
     SDL_Vertex vertex_12 = {{screenWidth,screenHeigth / 4 * 3},{255,255,255}, {1, 1}};
     SDL_Vertex vertices4[] = {vertex_10,vertex_11,vertex_12};
     DrawTriangle(vertices4, texture);
-    */
+    
     // ----- Circle ----- //
     Transform *t1 = new Transform();
     DrawBallsRecusive(root, t1);
@@ -118,15 +117,15 @@ void renderFrame(Component *root)
     //Calculate the current position
     //Render mesh when seen one.
     
-    /*
-    Mesh m = dynamic_cast<Renderer*>(Root->children[0]->children[1])->mesh;
+    
+    Mesh m = dynamic_cast<Renderer*>(root->children[0]->children[1])->mesh;
     std::cout << "VertexCount: " << m.vertexCount << " FaceCount: " << m.faceCount << std::endl;
     for(int i = 0; i < m.faceCount; i++)
     {
         Face f;
-        //Mat4x4::MultiplyMatrixVector(m.faces[i], *f.a, dynamic_cast<Camera*>(Root->children[1]->children[0].projectionMatrix));
+        //Mat4x4::MultiplyMatrixVector(m.faces[i], *f.a, dynamic_cast<Camera*>(root->children[1]->children[0].projectionMatrix));
     }
-    */
+    
 }
 
 void DrawBallsRecusive(Component *c, Transform *t)
