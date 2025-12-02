@@ -162,6 +162,7 @@ void ReadConfig(Action a[]) //Sets the values to actions.
 
                         std::cout << "Cur letter: " << h << "; holder: " << holder << " k: " << k << ", k-holder: " << k - holder << ", size(h): " << sizeof(h) << std::endl;
                         a[i].buttons[curButton].keys[curKey] = (SDL_KeyCode)ConfigToKeycode(h);
+                        //SDL_GetKeyFromName(h);
                         if(myString[k] == ',')
                         {
                             holder = k + 1;

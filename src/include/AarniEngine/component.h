@@ -25,21 +25,22 @@ class Component
         
         enum ComponentType componentType = empty;
     
-    void StartChildren() //Recursivly Starts all components.
+    void StartRecursive() //Recursivly Starts all components.
     {
+        Start();
         for(int i = 0; i < childCount; i++)
         {
             children[i]->Start();
-            children[i]->StartChildren();
+            children[i]->StartRecursive();
         }
     }
 
-    void UpdateChildren(double deltaTime) //Recursivly Updates all components.
+    void UpdateRecursive(double deltaTime) //Recursivly Updates all components.
     {
+        Update(deltaTime);
         for(int i = 0; i < childCount; i++)
         {
-            children[i]->Update(deltaTime);
-            children[i]->UpdateChildren(deltaTime);
+            children[i]->UpdateRecursive(deltaTime);
         }
     }
 

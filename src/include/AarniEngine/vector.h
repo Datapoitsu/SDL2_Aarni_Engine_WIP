@@ -1,21 +1,14 @@
 #ifndef _VECTORH_
 #define _VECTORH_
 
-/*
-TODO:
-    Project()
-    ProjectOnPlane()
-    RotateTowards()
-*/
-
 #include <math.h>
 #include <iostream>
 
 struct Vector3{
     float x, y, z = 0;
     Vector3 (float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {};
-    public:
 
+    public:
     static Vector3 Zero(){ return {0.0f, 0.0f, 0.0f}; } 
     static Vector3 One(){ return {1.0f, 1.0f, 1.0f}; } 
     static Vector3 Right(){ return {1.0f, 0.0f, 0.0f}; } 
@@ -32,7 +25,7 @@ struct Vector3{
 
     static float MagnitudeSquared(Vector3 v)
     {
-        return DotProduct(v,v);
+        return DotProduct(v);
     }
 
     static float Distance(Vector3 v1, Vector3 v2)
@@ -78,6 +71,11 @@ struct Vector3{
         return v1 + (v2 - v1) * position;
     }
 
+    static float DotProduct(Vector3 v)
+    {
+        return v.x * v.x + v.y * v.y + v.z * v.z;
+    }
+
     static float DotProduct(Vector3 v1, Vector3 v2)
     {
         return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
@@ -107,9 +105,14 @@ struct Vector3{
         return acosf(DotProduct(v1,v2) / (Magnitude(v1) * Magnitude(v2)));
     }
 
-    static Vector3 Projection(Vector3 v1, Vector3 v2)
+    static Vector3 Project(Vector3 v1, Vector3 v2)
     {
         return v2 * (DotProduct(v1,v2) / MagnitudeSquared(v2));
+    }
+
+    static Vector3 ProjectOnPlane(Vector3 v1, Vector3 v2)
+    {
+        return v1 - (DotProduct(v1,v2) / MagnitudeSquared(v2)) * v2;
     }
 
     static Vector3 Abs(Vector3 v)
@@ -274,7 +277,7 @@ struct Vector2{
 
     static float MagnitudeSquared(Vector2 v)
     {
-        return DotProduct(v,v);
+        return DotProduct(v);
     }
 
     static float Distance(Vector2 v1, Vector2 v2)
@@ -318,6 +321,11 @@ struct Vector2{
     static Vector2 Lerp(Vector2 v1, Vector2 v2, float position) //returns the vector where t = 0 is v1 and t = 1 is v2.
     {
         return v1 + (v2 - v1) * position;
+    }
+
+    static float DotProduct(Vector2 v)
+    {
+        return v.x * v.x + v.y * v.y;
     }
 
     static float DotProduct(Vector2 v1, Vector2 v2)
@@ -479,11 +487,6 @@ Vector2 operator*(const float f, Vector2 v1)
 Vector2 operator/(const float f, Vector2 v1)
 {
     return {v1.x / f, v1.y / f};
-}
-
-void TestVectors()
-{
-
 }
 
 #endif

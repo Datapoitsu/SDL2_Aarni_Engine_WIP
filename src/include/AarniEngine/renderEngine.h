@@ -109,23 +109,9 @@ void renderFrame(Component *root)
     // ----- Circle ----- //
     Transform *t1 = new Transform();
     DrawBallsRecusive(root, t1);
-    
-    SDL_RenderPresent(RenderInformation); //Draws things.
+    DrawCircle(screenWidth / 2, screenHeigth / 2, 50, {255,255,0});
 
-    //Start from root.
-    //Go through all components.
-    //Calculate the current position
-    //Render mesh when seen one.
-    
-    
-    Mesh m = dynamic_cast<Renderer*>(root->children[0]->children[1])->mesh;
-    std::cout << "VertexCount: " << m.vertexCount << " FaceCount: " << m.faceCount << std::endl;
-    for(int i = 0; i < m.faceCount; i++)
-    {
-        Face f;
-        //Mat4x4::MultiplyMatrixVector(m.faces[i], *f.a, dynamic_cast<Camera*>(root->children[1]->children[0].projectionMatrix));
-    }
-    
+    SDL_RenderPresent(RenderInformation); //Draws things.
 }
 
 void DrawBallsRecusive(Component *c, Transform *t)

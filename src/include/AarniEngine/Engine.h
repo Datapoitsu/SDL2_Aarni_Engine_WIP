@@ -53,13 +53,11 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-    // ----- Testautomation ----- //
-    TestVectors();
 
     Start();
+    std::cout << Vector2(2,2) << Vector2::Normalize({2,2}) << std::endl;
     //Calls update on all components
-    root->Start();
-    root->StartChildren();
+    root->StartRecursive();
     
     //Begining of calculating time.
     mingw_gettimeofday(&t1, NULL); 
@@ -83,10 +81,8 @@ int main(int argc, char *argv[])
         }
 
         UpdateInputs(Event);
-
         Update();
-        root->Update(deltaTime);
-        root->UpdateChildren(deltaTime);
+        root->UpdateRecursive(deltaTime);
 
         UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
