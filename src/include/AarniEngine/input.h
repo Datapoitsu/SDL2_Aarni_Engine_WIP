@@ -4,6 +4,14 @@
 #include <SDL2/SDL.h>
 #include <string.h>
 
+//TODO:
+/*
+    Restructure structs.
+
+    Button -> Main key & modifier keys
+    Modifiers = Ctrl, shift, alt, windows button
+*/
+
 struct Buttons //Has all buttons for an action. Action can have more than one buttons struct.
 {
     SDL_KeyCode keys[3];
@@ -13,7 +21,7 @@ struct Buttons //Has all buttons for an action. Action can have more than one bu
 
 struct Action //Action is something that you would see in binding settings as an action.
 {
-    char name[20];
+    char name[16];
     struct Buttons buttons[2];
 };
 
@@ -75,11 +83,26 @@ Action actions[] = {
     }
 };
 
+void PrintAction(Action a)
+{
+    std::cout << a.name << ":";
+    for(int i = 0; i < 2; i++) //Both buttons
+    {
+        for(int k = 0; k < 3; k++)
+        {
+            std::cout << a.buttons[i].keys;
+        }
+    }
+}
+
 void UnbindAll(Action a[]) //
 {
-    for(int i = 0; i < sizeof(*a) / 12; i++){
-        for(int k = 0; k < 2; k++){
-            for(int j = 0; j < 3; j++){
+    for(int i = 0; i < sizeof(*a) / 12; i++) //All actions
+    {
+        for(int k = 0; k < 2; k++) //All buttons in the action
+        {
+            for(int j = 0; j < 3; j++) //All button variants
+            {
                 a[i].buttons[k].keys[j] = SDLK_UNKNOWN;
             }
         }
@@ -102,15 +125,12 @@ SDL_Keycode ConfigToKeycode(std::string s)
     return SDLK_UNKNOWN;
 }
 
-void ReadConfig(Action a[]) //Sets the values to actions.
+void ReadConfig(Action a[], char path[] = "Binding.config") //Sets the values to actions.
 {
-    FILE *fptr;
-
-    fptr = fopen("Binding.config", "r");
-
+    FILE *fptr = fopen(path, "r");
     if(fptr == NULL)
     {
-        printf("Not able to open the file.");
+        printf("Unable to open the Binding file.");
         fclose(fptr); 
         return;
     }

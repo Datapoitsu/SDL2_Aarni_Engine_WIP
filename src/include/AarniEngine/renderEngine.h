@@ -52,6 +52,7 @@ void DrawCircle(int posX, int posY, float radius, SDL_Color color)
     if(radius == 1) //Edge case where the other part of the code isn't able to draw a circle with a radius of one.
     {
         SDL_RenderDrawPoint(RenderInformation,posX,posY);
+        return;
     }
     for(int vertical = 0; vertical < radius + 1; vertical++)
     {
@@ -70,6 +71,12 @@ void DrawCircle(int posX, int posY, float radius, SDL_Color color)
     }
 }
 
+void DrawLine(int x1, int y1, int x2, int y2, SDL_Color color)
+{
+    float multiplier = (y2 - y1) / (x2 - x1);
+    
+}
+
 void renderFrame(Component *root)
 {
     // ----- Draw background ----- //
@@ -77,6 +84,7 @@ void renderFrame(Component *root)
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
 
     SDL_SetRenderDrawColor(RenderInformation,125,0,0,255);
+    DrawLine(400,400,420,600,{255,0,0,255});
     //SDL_RenderDrawLine(RenderInformation,400,400,500,450);
     // ----- Triangle ----- //
     

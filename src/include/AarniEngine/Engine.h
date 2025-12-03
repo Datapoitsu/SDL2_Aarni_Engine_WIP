@@ -54,8 +54,9 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    std::cout << actions[0].name << std::endl;
+
     Start();
-    std::cout << Vector2(2,2) << Vector2::Normalize({2,2}) << std::endl;
     //Calls update on all components
     root->StartRecursive();
     
