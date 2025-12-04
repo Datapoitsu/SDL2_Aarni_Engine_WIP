@@ -4,111 +4,50 @@
 #include <SDL2/SDL.h>
 #include <string.h>
 
-//TODO:
-/*
-    Restructure structs.
-
-    Button -> Main key & modifier keys
-    Modifiers = Ctrl, shift, alt, windows button
-*/
-
-struct Buttons //Has all buttons for an action. Action can have more than one buttons struct.
+struct Button
 {
-    SDL_KeyCode keys[3];
-    bool isPressed[3] = {false,false,false};
-    bool previouslyPressed[3] = {false,false,false};
+    //Repeating the button press requires releasing and pressing the main key, modifiers aren't required for repeating.
+    SDL_Keycode key;
+    SDL_Keymod *modifiers = nullptr;
+    bool currentlyPressed = false;
+    bool previouslyPressd = false;
 };
-
+ 
 struct Action //Action is something that you would see in binding settings as an action.
 {
     char name[16];
-    struct Buttons buttons[2];
+    struct Button *buttons;
 };
 
 Action actions[] = {
-    {
-        {"Up"},
-        {
-            {
-                {SDLK_w,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
-            {
-                {SDLK_UP,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    },
-    {
-        {"Down"},
-        {
-            {
-                {SDLK_s,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
-            {
-                {SDLK_DOWN,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    },
-    {
-        {"Left"},
-        {
-            {
-                {SDLK_a,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
-            {
-                {SDLK_LEFT,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    },
-    {
-        {"Right"},
-        {
-            {
-                {SDLK_d,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            },
-            {
-                {SDLK_RIGHT,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    },
-    {
-        {"Activate"},
-        {
-            {
-                {SDLK_e,SDLK_r,SDLK_q},
-            },
-            {
-                {SDLK_UNKNOWN,SDLK_UNKNOWN,SDLK_UNKNOWN},
-            }
-        }
-    }
+    {"up"},
+    {"down"},
 };
 
 void PrintAction(Action a)
 {
     std::cout << a.name << ":";
-    for(int i = 0; i < 2; i++) //Both buttons
+    for(int i = 0; i < sizeof(*a.buttons); i++)
     {
-        for(int k = 0; k < 3; k++)
+        std::cout << "Button " << i << ": ";
+        for(int k = 0; k < sizeof(a.buttons[i].modifiers); k++)
         {
-            std::cout << a.buttons[i].keys;
+            std::cout << a.buttons[i].modifiers[k] << "+";
         }
+        std::cout << a.buttons[i].key;
     }
+    std::cout << "Reached the end! " << std::endl;
 }
 
-void UnbindAll(Action a[]) //
+void UnbindAll(Action a[])
 {
-    for(int i = 0; i < sizeof(*a) / 12; i++) //All actions
+    for(int i = 0; i < sizeof(*a) / sizeof(Action); i++) //All actions
     {
-        for(int k = 0; k < 2; k++) //All buttons in the action
-        {
-            for(int j = 0; j < 3; j++) //All button variants
-            {
-                a[i].buttons[k].keys[j] = SDLK_UNKNOWN;
-            }
-        }
+        a[i].buttons = nullptr;
     }
 }
 
+/*
 SDL_Keycode ConfigToKeycode(std::string s)
 {
     std::cout << "config to keycode: " << s << std::endl;
@@ -402,5 +341,5 @@ bool GetActionUpByName(std::string name) //Version with string.
     //printf("Couldn't find an input for action named: %s \n",name);
     return false;
 }
-
+*/
 #endif

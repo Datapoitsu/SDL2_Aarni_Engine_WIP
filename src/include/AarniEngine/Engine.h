@@ -11,7 +11,6 @@
 //SDL2
 #include <SDL2/SDL.h>
 
-
 //My own libraries
 #include <AarniEngine/input.h>
 #include <AarniEngine/vector.h>
@@ -53,9 +52,9 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-
-    std::cout << actions[0].name << std::endl;
-
+    PrintAction(actions[0]);
+    UnbindAll(actions);
+    PrintAction(actions[0]);
     Start();
     //Calls update on all components
     root->StartRecursive();
@@ -81,11 +80,11 @@ int main(int argc, char *argv[])
             break;
         }
 
-        UpdateInputs(Event);
+        //UpdateInputs(Event);
         Update();
         root->UpdateRecursive(deltaTime);
 
-        UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
+        //UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
         //PhysicsEngine();
         renderFrame(root);
