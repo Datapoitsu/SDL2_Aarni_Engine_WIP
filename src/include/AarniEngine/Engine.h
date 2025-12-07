@@ -52,9 +52,9 @@ int main(int argc, char *argv[])
     {
         return 1;
     }
-    PrintAction(actions[0]);
-    UnbindAll(actions);
-    PrintAction(actions[0]);
+    ReadInputConfig();
+    PrintAllActions();
+    
     Start();
     //Calls update on all components
     root->StartRecursive();
