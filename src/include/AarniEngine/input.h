@@ -3,6 +3,10 @@
 
 #include <SDL2/SDL.h>
 #include <string.h>
+#include <fstream>
+#include <iostream>
+
+char defaultInputConfigPath[] = "Binding.config";
 
 const char* SDL_GetNameFromMod(SDL_Keymod mod)
 {
@@ -28,37 +32,41 @@ const char* SDL_GetNameFromMod(SDL_Keymod mod)
 
 const SDL_Keymod SDL_GetModFromName(char c[])
 {
-    std::cout << "Looking for mod of the " << c << std::endl;
+    //Lower case.
+    for(int i = 0; i < sizeof(*c) / sizeof(char); i++)
+    {
+        c[i] = (char)tolower(c[i]);
+    }
     if (strcmp(c,"") == 0)              { return KMOD_NONE; }
-    if (strcmp(c,"Left Shift") == 0)    { return KMOD_LSHIFT ; }
-    if (strcmp(c,"Right Shift") == 0)   { return KMOD_RSHIFT; }
-    if (strcmp(c,"Shift") == 0)         { return KMOD_SHIFT; }
-    if (strcmp(c,"Left Ctrl") == 0)     { return KMOD_LCTRL; }
-    if (strcmp(c,"Right Ctrl") == 0)    { return KMOD_RCTRL; }
-    if (strcmp(c,"Ctrl") == 0)          { return KMOD_CTRL; }
-    if (strcmp(c,"Left Alt") == 0)      { return KMOD_LALT; }
-    if (strcmp(c,"Right Alt") == 0)     { return KMOD_RALT; }
-    if (strcmp(c,"Alt") == 0)           { return KMOD_ALT; }
-    if (strcmp(c,"Left GUI") == 0)      { return KMOD_LGUI; }
-    if (strcmp(c,"Right GUI") == 0)     { return KMOD_RGUI; }
-    if (strcmp(c,"GUI") == 0)           { return KMOD_GUI; }
-    if (strcmp(c,"Num") == 0)           { return KMOD_NUM; }
-    if (strcmp(c,"Caps") == 0)          { return KMOD_CAPS; }
-    if (strcmp(c,"Mode") == 0)          { return KMOD_MODE; }
+    if (strcmp(c,"left shift") == 0)    { return KMOD_LSHIFT ; }
+    if (strcmp(c,"right shift") == 0)   { return KMOD_RSHIFT; }
+    if (strcmp(c,"shift") == 0)         { return KMOD_SHIFT; }
+    if (strcmp(c,"left ctrl") == 0)     { return KMOD_LCTRL; }
+    if (strcmp(c,"right ctrl") == 0)    { return KMOD_RCTRL; }
+    if (strcmp(c,"ctrl") == 0)          { return KMOD_CTRL; }
+    if (strcmp(c,"left alt") == 0)      { return KMOD_LALT; }
+    if (strcmp(c,"right alt") == 0)     { return KMOD_RALT; }
+    if (strcmp(c,"alt") == 0)           { return KMOD_ALT; }
+    if (strcmp(c,"left gui") == 0)      { return KMOD_LGUI; }
+    if (strcmp(c,"right gui") == 0)     { return KMOD_RGUI; }
+    if (strcmp(c,"gui") == 0)           { return KMOD_GUI; }
+    if (strcmp(c,"num") == 0)           { return KMOD_NUM; }
+    if (strcmp(c,"caps") == 0)          { return KMOD_CAPS; }
+    if (strcmp(c,"mode") == 0)          { return KMOD_MODE; }
     std::cout << "Missing key modifier for name " << c << std::endl;
     return KMOD_NONE;
 }
 
-struct Button
+struct ButtonCombination
 {
-    //Repeating the button press requires releasing and pressing the main key, modifiers aren't required for repeating.
+    //Repeating the ButtonCombination press requires releasing and pressing the main key, modifiers aren't required for repeating.
     SDL_Keycode key;
     bool currentlyPressed = false;
     bool previouslyPressed = false;
     std::vector<SDL_Keymod> modifiers;
     std::vector<bool> modifiersPressedArr;
 
-    Button(SDL_Keycode keyName = SDLK_UNKNOWN, std::vector<SDL_Keymod> modifiersNames = {})
+    ButtonCombination(SDL_Keycode keyName = SDLK_UNKNOWN, std::vector<SDL_Keymod> modifiersNames = {})
     {
         key = keyName;
         modifiers = modifiersNames;
@@ -77,26 +85,26 @@ struct Button
         return true;
     }
 
-    bool ButtonPressed()
+    bool ButtonCombinationPressed()
     {
         return (currentlyPressed && ModifiersPressed());        
     }
 
-    bool ButtonUp()
+    bool ButtonCombinationUp()
     {
         return (!currentlyPressed && previouslyPressed && ModifiersPressed());
     }
 
-    bool ButtonDown()
+    bool ButtonCombinationDown()
     {
         return (currentlyPressed && !previouslyPressed && ModifiersPressed());
     }
 
     // ----- Printing ----- //
-    friend std::ostream& operator<<(std::ostream& os, const Button& pt); //overriding << operator
+    friend std::ostream& operator<<(std::ostream& os, const ButtonCombination& pt); //overriding << operator
 };
 
-std::ostream &operator<<(std::ostream &os, const Button &b) // overriding << operator
+std::ostream &operator<<(std::ostream &os, const ButtonCombination &b) // overriding << operator
 {
     for(int k = 0; k < b.modifiers.capacity(); k++)
     {
@@ -110,20 +118,20 @@ struct Action //Action is something that you would see in binding settings as an
 {
     public:
     char name[16];
-    std::vector<Button> buttons;
+    std::vector<ButtonCombination> ButtonCombinations;
 
-    Action(char actionName[] = (char*)("Undefined"), std::vector<Button> buttonList = {})
+    Action(char actionName[] = (char*)("Undefined"), std::vector<ButtonCombination> ButtonCombinationList = {})
     {
         strncpy(name, actionName, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';  // ensure null-termination
-        buttons = buttonList;
+        ButtonCombinations = ButtonCombinationList;
     }
 
     bool GetAction()
     {
-        for(int i = 0; i < buttons.capacity(); i++)
+        for(int i = 0; i < ButtonCombinations.capacity(); i++)
         {
-            if(buttons[i].ButtonPressed())
+            if(ButtonCombinations[i].ButtonCombinationPressed())
             {
                 return true;
             }
@@ -133,9 +141,9 @@ struct Action //Action is something that you would see in binding settings as an
 
     bool GetActionDown()
     {
-        for(int i = 0; i < buttons.capacity(); i++)
+        for(int i = 0; i < ButtonCombinations.capacity(); i++)
         {
-            if(buttons[i].ButtonDown())
+            if(ButtonCombinations[i].ButtonCombinationDown())
             {
                 return true;
             }
@@ -145,9 +153,9 @@ struct Action //Action is something that you would see in binding settings as an
 
     bool GetActionUp()
     {
-        for(int i = 0; i < buttons.capacity(); i++)
+        for(int i = 0; i < ButtonCombinations.capacity(); i++)
         {
-            if(buttons[i].ButtonUp())
+            if(ButtonCombinations[i].ButtonCombinationUp())
             {
                 return true;
             }
@@ -162,26 +170,26 @@ struct Action //Action is something that you would see in binding settings as an
 std::ostream &operator<<(std::ostream &os, const Action &a) // overriding << operator
 {
     os << a.name << ":" << std::endl;
-    if (a.buttons.capacity() == 0) //Missing binding.
+    if (a.ButtonCombinations.capacity() == 0) //Missing binding.
     {
         os << "\t" << "Unbinded" << std::endl;
         return os;
     }
 
-    for(int i = 0; i < a.buttons.capacity(); i++)
+    for(int i = 0; i < a.ButtonCombinations.capacity(); i++)
     {
-        std::cout << "\t" << a.buttons[i] << std::endl;
+        std::cout << "\t" << a.ButtonCombinations[i] << std::endl;
     }
     return os;
 }
 
 std::vector<Action> actions =
 {
-    Action((char*)"up", {Button(SDLK_w),Button(SDLK_UP)}),
-    Action((char*)"down", {Button(SDLK_s),Button(SDLK_DOWN)}),
-    Action((char*)"right", {Button(SDLK_d),Button(SDLK_RIGHT)}),
-    Action((char*)"left", {Button(SDLK_a),Button(SDLK_LEFT)}),
-    Action((char*)"activate", {Button(SDLK_e)}),
+    Action((char*)"up", {ButtonCombination(SDLK_w),ButtonCombination(SDLK_UP)}),
+    Action((char*)"down", {ButtonCombination(SDLK_s),ButtonCombination(SDLK_DOWN)}),
+    Action((char*)"right", {ButtonCombination(SDLK_d),ButtonCombination(SDLK_RIGHT)}),
+    Action((char*)"left", {ButtonCombination(SDLK_a),ButtonCombination(SDLK_LEFT)}),
+    Action((char*)"activate", {ButtonCombination(SDLK_e)}),
 };
 
 void PrintAllActions()
@@ -195,8 +203,8 @@ void PrintAllActions()
 
 void Unbind(Action *a)
 {
-    a->buttons.clear();
-    a->buttons.shrink_to_fit();
+    a->ButtonCombinations.clear();
+    a->ButtonCombinations.shrink_to_fit();
 }
 
 void UnbindAll()
@@ -207,51 +215,21 @@ void UnbindAll()
     }
 }
 
-void UpdateInputs(SDL_Event e) //Checks all defined actions and if the buttons are pressed.
+void UpdateInputs(SDL_Event e) //Checks all defined actions and if the ButtonCombinations are pressed.
 {
     for(int i = 0; i < actions.capacity(); i++)
     {
-        for(int k = 0; k < actions[i].buttons.capacity(); k++)
+        for(int k = 0; k < actions[i].ButtonCombinations.capacity(); k++)
         {
-            if (e.key.keysym.sym == actions[i].buttons[k].key)
+            // ----- Set modifiers ----- //
+            for(int j = 0; j < actions[i].ButtonCombinations[k].modifiers.capacity(); j++)
             {
-                if(e.type == SDL_KEYDOWN) //Key pressed down
-                {
-                    actions[i].buttons[k].currentlyPressed = true;
-                }
-                if(e.type == SDL_KEYUP) //Key pressed up
-                {
-                    actions[i].buttons[k].currentlyPressed = true;
-                }
+                //std::cout << actions[i].ButtonCombinations[k].modifiers[j] << std::endl;
+                std::cout << (e.key.keysym.mod == actions[i].ButtonCombinations[k].modifiers[j]) << std::endl;
             }
-        }
-        for(int k = 0; k < actions[i].buttons.capacity(); k++)
-        {
-            for(int j = 0; j < actions[i].buttons[k].modifiers.capacity(); j++)
-            {
-                if (e.key.keysym.sym == actions[i].buttons[k].modifiers[j])
-                {
-                    if(e.type == SDL_KEYDOWN) //Key pressed down
-                    {
-                        actions[i].buttons[k].modifiersPressedArr[j] = true;
-                    }
-                    if(e.type == SDL_KEYUP) //Key pressed up
-                    {
-                        actions[i].buttons[k].modifiersPressedArr[j] = true;
-                    }
-                }
-            }
-        }
-    }
-}
-
-void UpdatePreviousInputs(SDL_Event e) //Sets values for previously pressed buttons. Used for GetKeyUp & GetKeyDown.
-{
-    for(int i = 0; i < actions.capacity(); i++)
-    {
-        for(int k = 0; k < actions[i].buttons.capacity(); k++)
-        {
-            actions[i].buttons[k].previouslyPressed = actions[i].buttons[k].currentlyPressed;
+            // ----- Set key ----- //
+            actions[i].ButtonCombinations[k].previouslyPressed = actions[i].ButtonCombinations[k].currentlyPressed;
+            actions[i].ButtonCombinations[k].currentlyPressed = (e.key.keysym.sym == actions[i].ButtonCombinations[k].key);
         }
     }
 }
@@ -298,7 +276,15 @@ bool GetActionUpByName(std::string name)
     return false;
 }
 
-void ReadInputConfig(char path[] = (char*)"Binding.config")
+bool GetButtonByName(char buttonName[])
+{
+    /*if(Event.key.keysym.sym == SDL_GetKeyFromName(buttonName)){
+        return true;
+    }*/
+    return false;
+}
+
+void ReadInputConfig(char path[] = (char*)defaultInputConfigPath)
 {
     FILE *fptr = fopen(path, "r");
     if(fptr == NULL)
@@ -315,8 +301,6 @@ void ReadInputConfig(char path[] = (char*)"Binding.config")
 
     while(fgets(buffer, bufferSize, fptr)) // Read the content and print it.
     {
-        printf("%s", buffer);
-
         // ----- Finding the action corresponding to the name ----- //
         int nameLength = 0;
         for(int i = 0; i < bufferSize; i++)
@@ -351,9 +335,9 @@ void ReadInputConfig(char path[] = (char*)"Binding.config")
             continue;
         }
         
-        std::vector<Button> resultButtons;
-        Button buttonHolder;
-        int buttonNameBegin = nameLength;
+        std::vector<ButtonCombination> resultButtonCombinations;
+        ButtonCombination ButtonCombinationHolder;
+        int ButtonCombinationNameBegin = nameLength;
         for(int i = nameLength; i < sizeof(buffer); i++) //Starts from first bracket
         {
             if(buffer[i] == '\0') //Exit once the row ends
@@ -362,35 +346,68 @@ void ReadInputConfig(char path[] = (char*)"Binding.config")
             }
             if(buffer[i] == '{')
             {
-                buttonHolder = Button();
-                buttonNameBegin = i + 1;
+                ButtonCombinationHolder = ButtonCombination();
+                ButtonCombinationNameBegin = i + 1;
             }
             if(buffer[i] == '+' || buffer[i] == '}')
             {
-                std::cout << buttonNameBegin << " " << i << " " << i - buttonNameBegin << std::endl;
-                char sub[i - buttonNameBegin + 1];
-                strncpy(sub, buffer + buttonNameBegin, i - buttonNameBegin);                
-                sub[i - buttonNameBegin] = '\0';
-                std::cout << sub << std::endl;
-
-                buttonNameBegin = i + 1;
+                char sub[i - ButtonCombinationNameBegin + 1];
+                strncpy(sub, buffer + ButtonCombinationNameBegin, i - ButtonCombinationNameBegin);                
+                sub[i - ButtonCombinationNameBegin] = '\0';
+                ButtonCombinationNameBegin = i + 1;
 
                 if(buffer[i] == '+')
                 {
-                    std::cout << "Mod: " << SDL_GetModFromName(sub) << std::endl;
-                    buttonHolder.modifiers.push_back(SDL_GetModFromName(sub));
-                    buttonNameBegin = i + 1;
+                    SDL_Keymod mod = SDL_GetModFromName(sub);
+                    if (mod != KMOD_NONE)
+                    {
+                        ButtonCombinationHolder.modifiers.push_back(SDL_GetModFromName(sub));
+                    }
+                    ButtonCombinationNameBegin = i + 1;
                 }
                 else if (buffer[i] == '}')
                 {
-                    buttonHolder.key = SDL_GetKeyFromName(sub);
-                    actions[actionIndex].buttons.push_back(buttonHolder);
-                    buttonHolder = Button();
-                    buttonNameBegin = i + 1;
+                    SDL_Keycode key = SDL_GetKeyFromName(sub);
+                    if(key != SDLK_UNKNOWN)
+                    {
+                        ButtonCombinationHolder.key = key;
+                    }
+                    actions[actionIndex].ButtonCombinations.push_back(ButtonCombinationHolder);
+                    ButtonCombinationHolder = ButtonCombination();
+                    ButtonCombinationNameBegin = i + 1;
                 }
             }
         }
     }
     fclose(fptr);
+}
+
+void SaveInputConfig(const char *path = defaultInputConfigPath)
+{
+    std::ofstream file(path);
+    if (!file)
+    {
+        std::cout << "Error: Input safe file not created at SaveInputConfig()" << std::endl;
+        return;
+    }
+
+    for(int i = 0; i < actions.capacity(); i++)
+    {
+        file << actions[i].name;
+        for(int k = 0; k < actions[i].ButtonCombinations.capacity(); k++)
+        {
+            file << "{";
+            for(int j = 0; j < actions[i].ButtonCombinations[k].modifiers.capacity(); j++)
+            {
+                file << SDL_GetNameFromMod(actions[i].ButtonCombinations[k].modifiers[j]) << "+";
+            }
+            file << SDL_GetKeyName(actions[i].ButtonCombinations[k].key) << "}";
+        }
+        if(i < actions.capacity() - 1) //No new line for the last row
+        {
+            file << "\n";
+        }
+    }
+    file.close();
 }
 #endif

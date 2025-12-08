@@ -46,15 +46,14 @@ int fpsLimiter = 60;
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-
-    std::cout << "Starting" << std::endl;
+    std::cout << "Engine starting" << std::endl;
+    SDL_Event Event;
     if(createWindow() == false)
     {
         return 1;
     }
     ReadInputConfig();
-    PrintAllActions();
-    
+
     Start();
     //Calls update on all components
     root->StartRecursive();
@@ -62,12 +61,9 @@ int main(int argc, char *argv[])
     //Begining of calculating time.
     mingw_gettimeofday(&t1, NULL); 
     
-    std::cout << "Start completed succesfully" << std::endl;
-
     while (true)
     {
         //Ending application.
-        SDL_Event Event;
         if (SDL_PollEvent(&Event))
         {
             if (SDL_QUIT == Event.type)
@@ -80,11 +76,9 @@ int main(int argc, char *argv[])
             break;
         }
 
-        //UpdateInputs(Event);
+        UpdateInputs(Event);
         Update();
         root->UpdateRecursive(deltaTime);
-
-        //UpdatePreviousInputs(Event); //Updates previousinputs, used for keyUp and keyDown functions
 
         //PhysicsEngine();
         renderFrame(root);
