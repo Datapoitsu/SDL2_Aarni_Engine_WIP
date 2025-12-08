@@ -47,12 +47,15 @@ int main(int argc, char *argv[])
 {
     srand(time(NULL));
     std::cout << "Engine starting" << std::endl;
-    SDL_Event Event;
+    
     if(createWindow() == false)
     {
         return 1;
     }
-    ReadInputConfig();
+
+    //ReadInputConfig();
+    PrintAllActions();
+    SaveInputConfig();
 
     Start();
     //Calls update on all components
@@ -63,6 +66,7 @@ int main(int argc, char *argv[])
     
     while (true)
     {
+        SDL_Event Event;
         //Ending application.
         if (SDL_PollEvent(&Event))
         {
