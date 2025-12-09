@@ -8,100 +8,31 @@
 
 const char defaultInputConfigPath[] = "Binding.config";
 
-std::string SDL_GetNamesFromMod(SDL_Keymod mod)
-{
-    if (mod == KMOD_NONE)   { return ""; }
-    std::string result = "";
-    if (mod & KMOD_LCTRL && mod & KMOD_RCTRL)   { result += "Ctrl+"; }
-    else
-    {
-        if (mod & KMOD_LCTRL)  { result += "Left Ctrl+"; }
-        if (mod & KMOD_RCTRL)  { result += "Right Ctrl+"; }
-    }
-    if (mod & KMOD_LSHIFT && mod & KMOD_RSHIFT)  { result += "Shift+"; }
-    else
-    {
-        if (mod & KMOD_LSHIFT) { result += "Left Shift+"; }
-        if (mod & KMOD_RSHIFT) { result += "Right Shift+"; }
-    }
-    if (mod & KMOD_LALT && mod & KMOD_RALT)    { result += "Alt+"; }
-    else
-    {
-        if (mod & KMOD_LALT)   { result += "Left Alt+"; }
-        if (mod & KMOD_RALT)   { result += "Right Alt+"; }
-    }
-    if (mod & KMOD_LGUI && mod & KMOD_RGUI)    { result += "GUI+"; }
-    else
-    {
-        if (mod & KMOD_LGUI)   { result += "Left GUI+"; }
-        if (mod & KMOD_RGUI)   { result += "Right GUI+"; }
-    }
-    if (mod & KMOD_NUM)    { result += "Num+"; }
-    if (mod & KMOD_CAPS)   { result += "Caps+"; }
-    if (mod & KMOD_MODE)   { result += "Alt Gr+"; }
-
-    if(result[result.length() - 1] == '+')
-    {
-        result.pop_back();
-    }
-    return result;
-}
-
-const SDL_Keymod SDL_GetModFromName(char c[])
-{
-    //Lower case.
-    for(int i = 0; i < sizeof(*c) / sizeof(char); i++)
-    {
-        c[i] = (char)tolower(c[i]);
-    }
-    if (strcmp(c,"") == 0)              { return KMOD_NONE; }
-    if (strcmp(c,"left shift") == 0)    { return KMOD_LSHIFT ; }
-    if (strcmp(c,"right shift") == 0)   { return KMOD_RSHIFT; }
-    if (strcmp(c,"shift") == 0)         { return KMOD_SHIFT; }
-    if (strcmp(c,"left ctrl") == 0)     { return KMOD_LCTRL; }
-    if (strcmp(c,"right ctrl") == 0)    { return KMOD_RCTRL; }
-    if (strcmp(c,"ctrl") == 0)          { return KMOD_CTRL; }
-    if (strcmp(c,"left alt") == 0)      { return KMOD_LALT; }
-    if (strcmp(c,"right alt") == 0)     { return KMOD_RALT; }
-    if (strcmp(c,"alt") == 0)           { return KMOD_ALT; }
-    if (strcmp(c,"left gui") == 0)      { return KMOD_LGUI; }
-    if (strcmp(c,"right gui") == 0)     { return KMOD_RGUI; }
-    if (strcmp(c,"gui") == 0)           { return KMOD_GUI; }
-    if (strcmp(c,"num") == 0)           { return KMOD_NUM; }
-    if (strcmp(c,"caps") == 0)          { return KMOD_CAPS; }
-    if (strcmp(c,"mode") == 0)          { return KMOD_MODE; }
-    std::cout << "Missing key modifier for name " << c << std::endl;
-    return KMOD_NONE;
-}
-
 struct ButtonCombination
 {
-    //Repeating the ButtonCombination press requires releasing and pressing the main key, modifiers aren't required for repeating.
-    SDL_Keycode key;
+    //Last scancode is the main one. When repeating a button press, the last scancode needs to be released.
+    std::vector<SDL_Scancode> scancodes;
     bool currentlyPressed = false;
     bool previouslyPressed = false;
-    SDL_Keymod modification = KMOD_NONE;
-    bool modsPressed = true;
 
-    ButtonCombination(SDL_Keycode keyName = SDLK_UNKNOWN, SDL_Keymod keyMod = KMOD_NONE)
+    ButtonCombination(std::vector<SDL_Scancode> keyName = {})
     {
-        key = keyName;
-        modification = keyMod;
+        scancodes = keyName;
     }
 
     bool ButtonCombinationPressed()
     {
-        return (currentlyPressed && modsPressed);        
+        return currentlyPressed;        
     }
 
     bool ButtonCombinationUp()
     {
-        return (!currentlyPressed && previouslyPressed && modsPressed);
+        return !currentlyPressed && previouslyPressed;
     }
 
     bool ButtonCombinationDown()
     {
-        return (currentlyPressed && !previouslyPressed && modsPressed);
+        return currentlyPressed && !previouslyPressed;
     }
 
     // ----- Printing ----- //
@@ -110,12 +41,14 @@ struct ButtonCombination
 
 std::ostream &operator<<(std::ostream &os, const ButtonCombination &b) // overriding << operator
 {
-    std::string modifiers = SDL_GetNamesFromMod((SDL_Keymod)b.modification);
-    if(modifiers.length() > 0)
+    for(int i = 0; i < b.scancodes.capacity(); i++)
     {
-        os << modifiers << "+";
+        os << b.scancodes[i];
+        if(i < b.scancodes.capacity() - 1)
+        {
+            os << "+";
+        }
     }
-    os << SDL_GetKeyName(b.key);
     return os;
 }
 
@@ -190,12 +123,12 @@ std::ostream &operator<<(std::ostream &os, const Action &a) // overriding << ope
 
 std::vector<Action> actions =
 {
-    Action((char*)"up", {ButtonCombination(SDLK_w),ButtonCombination(SDLK_UP)}),
-    Action((char*)"down", {ButtonCombination(SDLK_s),ButtonCombination(SDLK_DOWN)}),
-    Action((char*)"right", {ButtonCombination(SDLK_d),ButtonCombination(SDLK_RIGHT)}),
-    Action((char*)"left", {ButtonCombination(SDLK_a),ButtonCombination(SDLK_LEFT)}),
-    Action((char*)"activate", {ButtonCombination(SDLK_e,(SDL_Keymod)195)}),
-    Action((char*)"crouch", {ButtonCombination(SDLK_LCTRL)}),
+    Action((char*)"up",{ButtonCombination({SDL_SCANCODE_W}), ButtonCombination({SDL_SCANCODE_UP})}),
+    Action((char*)"down",{ButtonCombination({SDL_SCANCODE_S}), ButtonCombination({SDL_SCANCODE_DOWN})}),
+    Action((char*)"right",{ButtonCombination({SDL_SCANCODE_D}), ButtonCombination({SDL_SCANCODE_RIGHT})}),
+    Action((char*)"left",{ButtonCombination({SDL_SCANCODE_A}), ButtonCombination({SDL_SCANCODE_LEFT})}),
+    Action((char*)"activate",{ButtonCombination({SDL_SCANCODE_LCTRL,SDL_SCANCODE_LSHIFT,SDL_SCANCODE_E})}),
+    Action((char*)"crouch",{ButtonCombination({SDL_SCANCODE_LALT})}),
 };
 
 void PrintAllActions()
@@ -223,25 +156,24 @@ void UnbindAll()
 
 void UpdateInputs(SDL_Event e) //Checks all defined actions and if the ButtonCombinations are pressed.
 {
+    const Uint8 *keyState = SDL_GetKeyboardState(NULL);
+    
     for(int i = 0; i < actions.capacity(); i++)
     {
         for(int k = 0; k < actions[i].ButtonCombinations.capacity(); k++)
         {
-            // ----- Set modifiers ----- //
-            if (actions[i].ButtonCombinations[k].modification == KMOD_NONE)
-            {
-                actions[i].ButtonCombinations[k].modsPressed = true;
-            }
-            else
-            {
-                actions[i].ButtonCombinations[k].modsPressed = (e.key.keysym.mod & actions[i].ButtonCombinations[k].modification) == e.key.keysym.mod;
-            }
-            // ----- Set key ----- //
             actions[i].ButtonCombinations[k].previouslyPressed = actions[i].ButtonCombinations[k].currentlyPressed;
-            actions[i].ButtonCombinations[k].currentlyPressed = (e.key.keysym.sym == actions[i].ButtonCombinations[k].key);
+            if(actions[i].ButtonCombinations[k].scancodes.capacity() == 1)
+            {
+                actions[i].ButtonCombinations[k].currentlyPressed = 
+            }
+
+            for(int j = 0; j < actions[i].ButtonCombinations[k].scancodes.capacity(); j++)
+            {
+                actions[i].ButtonCombinations[k].currentlyPressed = keyState[];
+            }
         }
     }
-    std::cout << actions[4].ButtonCombinations[0].currentlyPressed << actions[4].ButtonCombinations[0].previouslyPressed << actions[4].ButtonCombinations[0].modsPressed << std::endl;
 }
 
 bool GetActionByName(std::string name)

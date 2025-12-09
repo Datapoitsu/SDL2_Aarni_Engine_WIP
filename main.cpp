@@ -7,24 +7,30 @@ void Start() //This function is called at the start of the app.
 
 void Update() //This function is called at every frame.
 {
-    if(GetActionDownByName("up"))
+    /*
+    if(GetActionByName("up"))
     {
         std::cout << "up" << std::endl;
     }
-    if(GetActionDownByName("down"))
+    if(GetActionByName("down"))
     {
         std::cout << "down" << std::endl;
     }
-    if(GetActionDownByName("right"))
+    if(GetActionByName("right"))
     {
         std::cout << "right" << std::endl;
     }
-    if(GetActionDownByName("left"))
+    if(GetActionByName("left"))
     {
         std::cout << "left" << std::endl;
-    }
-    if(GetActionDownByName("activate"))
+    }*/
+    if(GetActionByName("activate"))
     {
         std::cout << "activate" << std::endl;
     }
+    /*if(GetActionByName("crouch"))
+    {
+        std::cout << "crouch" << std::endl;
+    }*/
+    
 }
