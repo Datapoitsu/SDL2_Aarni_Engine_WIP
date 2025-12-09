@@ -7,32 +7,54 @@
 #include <iostream>
 
 const char defaultInputConfigPath[] = "Binding.config";
+const Uint8 *keyState = SDL_GetKeyboardState(NULL);
+Uint8 prevKeys[SDL_NUM_SCANCODES];
 
 struct ButtonCombination
 {
-    //Last scancode is the main one. When repeating a button press, the last scancode needs to be released.
     std::vector<SDL_Scancode> scancodes;
-    bool currentlyPressed = false;
-    bool previouslyPressed = false;
 
     ButtonCombination(std::vector<SDL_Scancode> keyName = {})
     {
         scancodes = keyName;
     }
 
-    bool ButtonCombinationPressed()
+    bool CurrentlyPressed()
     {
-        return currentlyPressed;        
+        bool pressed = true;
+        for(int i = 0; i < scancodes.capacity(); i++)
+        {
+            if(!keyState[scancodes[i]])
+            {
+                pressed = false;
+                break;
+            }
+        }
+        return pressed;        
+    }
+
+    bool PreviouslyPressed()
+    {
+        bool pressed = true;
+        for(int i = 0; i < scancodes.capacity(); i++)
+        {
+            if(!prevKeys[scancodes[i]])
+            {
+                pressed = false;
+                break;
+            }
+        }
+        return pressed;        
     }
 
     bool ButtonCombinationUp()
     {
-        return !currentlyPressed && previouslyPressed;
+        return !CurrentlyPressed() && PreviouslyPressed();
     }
 
     bool ButtonCombinationDown()
     {
-        return currentlyPressed && !previouslyPressed;
+        return CurrentlyPressed() && !PreviouslyPressed();
     }
 
     // ----- Printing ----- //
@@ -43,7 +65,7 @@ std::ostream &operator<<(std::ostream &os, const ButtonCombination &b) // overri
 {
     for(int i = 0; i < b.scancodes.capacity(); i++)
     {
-        os << b.scancodes[i];
+        os << SDL_GetKeyName(SDL_GetKeyFromScancode(b.scancodes[i]));
         if(i < b.scancodes.capacity() - 1)
         {
             os << "+";
@@ -69,7 +91,7 @@ struct Action //Action is something that you would see in binding settings as an
     {
         for(int i = 0; i < ButtonCombinations.capacity(); i++)
         {
-            if(ButtonCombinations[i].ButtonCombinationPressed())
+            if(ButtonCombinations[i].CurrentlyPressed())
             {
                 return true;
             }
@@ -154,26 +176,15 @@ void UnbindAll()
     }
 }
 
-void UpdateInputs(SDL_Event e) //Checks all defined actions and if the ButtonCombinations are pressed.
+void UpdateInputs() //Checks all defined actions and if the ButtonCombinations are pressed.
 {
-    const Uint8 *keyState = SDL_GetKeyboardState(NULL);
-    
-    for(int i = 0; i < actions.capacity(); i++)
-    {
-        for(int k = 0; k < actions[i].ButtonCombinations.capacity(); k++)
-        {
-            actions[i].ButtonCombinations[k].previouslyPressed = actions[i].ButtonCombinations[k].currentlyPressed;
-            if(actions[i].ButtonCombinations[k].scancodes.capacity() == 1)
-            {
-                actions[i].ButtonCombinations[k].currentlyPressed = 
-            }
+    SDL_PumpEvents();
+    keyState = SDL_GetKeyboardState(NULL);
+}
 
-            for(int j = 0; j < actions[i].ButtonCombinations[k].scancodes.capacity(); j++)
-            {
-                actions[i].ButtonCombinations[k].currentlyPressed = keyState[];
-            }
-        }
-    }
+void UpdatePreviousInputs()
+{
+    memcpy(prevKeys, keyState, SDL_NUM_SCANCODES);
 }
 
 bool GetActionByName(std::string name)
@@ -218,12 +229,43 @@ bool GetActionUpByName(std::string name)
     return false;
 }
 
-bool GetButtonByName(char buttonName[])
+bool GetButtonByName(const char buttonName[])
 {
-    /*if(Event.key.keysym.sym == SDL_GetKeyFromName(buttonName)){
-        return true;
-    }*/
-    return false;
+    return keyState[SDL_GetScancodeFromName(buttonName)];
+}
+
+bool GetButtonByName(const std::string *buttonName)
+{
+    int n = buttonName->length();
+    char arr[n + 1];
+    strcpy(arr, buttonName->c_str());
+    return GetButtonByName(arr);
+}
+
+bool GetButtonDownByName(const char buttonName[])
+{
+    return (!(bool)prevKeys[SDL_GetScancodeFromName(buttonName)] && (bool)keyState[SDL_GetScancodeFromName(buttonName)]);
+}
+
+bool GetButtonDownByName(const std::string *buttonName)
+{
+    int n = buttonName->length();
+    char arr[n + 1];
+    strcpy(arr, buttonName->c_str());
+    return GetButtonDownByName(arr);
+}
+
+bool GetButtonUpByName(const char buttonName[])
+{
+    return ((bool)prevKeys[SDL_GetScancodeFromName(buttonName)] && !(bool)keyState[SDL_GetScancodeFromName(buttonName)]);
+}
+
+bool GetButtonUpByName(const std::string *buttonName)
+{
+    int n = buttonName->length();
+    char arr[n + 1];
+    strcpy(arr, buttonName->c_str());
+    return GetButtonUpByName(arr);
 }
 
 void ReadInputConfig(char path[] = (char*)defaultInputConfigPath)
@@ -298,22 +340,13 @@ void ReadInputConfig(char path[] = (char*)defaultInputConfigPath)
                 sub[i - ButtonCombinationNameBegin] = '\0';
                 ButtonCombinationNameBegin = i + 1;
 
-                if(buffer[i] == '+')
+                if(buffer[i] == '+' or buffer[i] == '}')
                 {
-                    SDL_Keymod mod = SDL_GetModFromName(sub);
-                    if (mod != KMOD_NONE)
-                    {
-                        ButtonCombinationHolder.modification = (SDL_Keymod)(ButtonCombinationHolder.modification | (SDL_GetModFromName(sub)));
-                    }
+                    ButtonCombinationHolder.scancodes.push_back(SDL_GetScancodeFromName(sub));
                     ButtonCombinationNameBegin = i + 1;
                 }
-                else if (buffer[i] == '}')
+                if (buffer[i] == '}')
                 {
-                    SDL_Keycode key = SDL_GetKeyFromName(sub);
-                    if(key != SDLK_UNKNOWN)
-                    {
-                        ButtonCombinationHolder.key = key;
-                    }
                     actions[actionIndex].ButtonCombinations.push_back(ButtonCombinationHolder);
                     ButtonCombinationHolder = ButtonCombination();
                     ButtonCombinationNameBegin = i + 1;
@@ -339,12 +372,15 @@ void SaveInputConfig(const char *path = defaultInputConfigPath)
         for(int k = 0; k < actions[i].ButtonCombinations.capacity(); k++)
         {
             file << "{";
-            file << SDL_GetNamesFromMod(actions[i].ButtonCombinations[k].modification);
-            if(actions[i].ButtonCombinations[k].modification != KMOD_NONE)
+            for(int j = 0; j < actions[i].ButtonCombinations[k].scancodes.capacity(); j++)
             {
-                file << "+";
+                file << SDL_GetKeyName(SDL_GetKeyFromScancode(actions[i].ButtonCombinations[k].scancodes[j]));
+                if(j < actions[i].ButtonCombinations[k].scancodes.capacity() - 1)
+                {
+                    file << "+";
+                }
             }
-            file << SDL_GetKeyName(actions[i].ButtonCombinations[k].key) << "}";
+            file << "}";
         }
         if(i < actions.capacity() - 1) //No new line for the last row
         {

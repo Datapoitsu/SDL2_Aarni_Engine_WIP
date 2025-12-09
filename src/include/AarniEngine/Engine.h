@@ -53,9 +53,8 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    //ReadInputConfig();
+    ReadInputConfig();
     PrintAllActions();
-    SaveInputConfig();
 
     Start();
     //Calls update on all components
@@ -80,8 +79,9 @@ int main(int argc, char *argv[])
             break;
         }
 
-        UpdateInputs(Event);
+        UpdateInputs();
         Update();
+        UpdatePreviousInputs();
         root->UpdateRecursive(deltaTime);
 
         //PhysicsEngine();
