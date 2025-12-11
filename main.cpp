@@ -7,5 +7,8 @@ void Start() //This function is called at the start of the app.
 
 void Update() //This function is called at every frame.
 {
-
+    if(GetButtonDownByName("e"))
+    {
+        PrintControllers();
+    }
 }

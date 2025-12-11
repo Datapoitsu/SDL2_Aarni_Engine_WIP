@@ -1,6 +1,23 @@
 #ifndef _INPUTH_
 #define _INPUTH_
 
+/*
+TODO:
+Rebind functions
+Axis
+    GetDelta()
+    Deadzone
+    Smooth
+    Raw
+
+Devices:
+    Mouse
+        GetPointerPosition()
+        GetDelta()
+    Controller
+        rumble
+*/
+
 #include <SDL2/SDL.h>
 #include <string.h>
 #include <fstream>
@@ -266,6 +283,31 @@ bool GetButtonUpByName(const std::string *buttonName)
     char arr[n + 1];
     strcpy(arr, buttonName->c_str());
     return GetButtonUpByName(arr);
+}
+
+void PrintControllers()
+{
+    std::cout << "# ----- Controllers ----- #" << std::endl;
+    std::cout << "Count: " << SDL_NumJoysticks() << std::endl;
+    for(int i = 0; i < SDL_NumJoysticks(); i++)
+    {
+        PrintController(i);
+    }
+}
+
+void PrintController(int controllerID)
+{
+    SDL_Joystick *joy = SDL_JoystickOpen(controllerID);
+    std::cout << "Controller: " << (controllerID+1) << std::endl;
+    std::cout << "\t" << "Name: " << SDL_JoystickName(joy) << std::endl;
+    std::cout << "\t" << "Instance ID: " << SDL_JoystickFromInstanceID(controllerID) << std::endl;
+    std::cout << "\t" << "Player ID: " << SDL_JoystickFromPlayerIndex(controllerID) << std::endl;
+    std::cout << "\t" << "Power: " << SDL_JoystickCurrentPowerLevel(joy) << std::endl;
+    std::cout << "\t" << "Type: " << SDL_JoystickGetType(joy) << std::endl;
+    std::cout << "\t" << "Vendor: " << SDL_JoystickGetDeviceVendor(controllerID) << std::endl;
+    std::cout << "\t" << "Led: " << (bool)SDL_JoystickHasLED(joy) << std::endl;
+    std::cout << "\t" << "Rumble: " << (bool)SDL_JoystickHasRumble(joy) << std::endl;
+    std::cout << "\t" << "Rumble triggers: " << (bool)SDL_JoystickHasRumbleTriggers(joy) << std::endl;
 }
 
 void ReadInputConfig(char path[] = (char*)defaultInputConfigPath)
