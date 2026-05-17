@@ -14,6 +14,8 @@
 //My own libraries
 #include <AarniEngine/input.h>
 #include <AarniEngine/vector.h>
+#include <AarniEngine/color.h>
+#include <AarniEngine/curve.h>
 #include <AarniEngine/quaternion.h>
 #include <AarniEngine/mat4x4.h>
 
@@ -85,7 +87,7 @@ int main(int argc, char *argv[])
         root->UpdateRecursive(deltaTime);
 
         //PhysicsEngine();
-        renderFrame(root);
+        renderFrame(root, sessionTime);
 
         //fps limiter
         Sleep(std::max(0.0,(1000 / fpsLimiter) - (deltaTime * 1000)));

@@ -50,6 +50,23 @@ class Component
         children.push_back(&child);
         childCount++;
     }
+
+    int Depth(Component *c = nullptr, int value = 0)
+    {
+        if(c == nullptr){c = this;}
+        if(c->childCount == 0){ return value; }
+        
+        int greatest = 0;
+        for(int i = 0; i < c->childCount; i++)
+        {
+            int holder = Depth(c->children[i], value + 1);
+            if(holder > greatest)
+            {
+                greatest = holder;
+            }
+        }
+        return greatest;
+    }
 };
 
 #endif

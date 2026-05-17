@@ -26,7 +26,7 @@ void CalculateCollisions()
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
     for(int i = 0; i < physicsComponentCount; i++)
     {
-        DrawCircle(physicsComponentsTransforms[i]->position.x, physicsComponentsTransforms[i]->position.y, dynamic_cast<CircleCollider*>(physicsComponents[i])->radius, {255,(Uint8)((255 / physicsComponentCount) * i),(Uint8)(255 - (255 / physicsComponentCount) * i)});
+        //DrawCircle(physicsComponentsTransforms[i]->position.x, physicsComponentsTransforms[i]->position.y, dynamic_cast<CircleCollider*>(physicsComponents[i])->radius, {255,(Uint8)((255 / physicsComponentCount) * i),(Uint8)(255 - (255 / physicsComponentCount) * i)});
     }
     SDL_RenderPresent(RenderInformation);
 

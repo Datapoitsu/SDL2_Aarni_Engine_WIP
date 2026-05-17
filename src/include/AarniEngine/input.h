@@ -291,7 +291,7 @@ void PrintControllers()
     std::cout << "Count: " << SDL_NumJoysticks() << std::endl;
     for(int i = 0; i < SDL_NumJoysticks(); i++)
     {
-        PrintController(i);
+        //PrintController(i);
     }
 }
 
