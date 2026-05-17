@@ -1,7 +1,6 @@
 #ifndef _ENGINEH_
 #define _ENGINEH_
 
-//Windows libraries.
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>

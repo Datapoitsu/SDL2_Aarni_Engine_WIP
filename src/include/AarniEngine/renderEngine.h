@@ -86,6 +86,66 @@ void DrawLineSimple(Vector2 v1, Vector2 v2, Color color)
     DrawLineSimple(static_cast<int>(v1.x), static_cast<int>(v1.y), static_cast<int>(v2.x), static_cast<int>(v2.y), color);
 }
 
+void DrawLineSimple(float x1, float y1, float x2, float y2, Color color)
+{
+    DrawLineSimple(static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2), color);
+}
+
+void DrawLineSimple(int x1, int y1, int x2, int y2, ColorGradient color)
+{
+    int dx = x2 - x1;
+    int dy = y2 - y1;
+    if(abs(dx) >= abs(dy)) //Horizontal draw.
+    {
+        float m = Vector2Int::Slope({x1,y1},{x2,y2});
+        if(x2 < x1) //Swaping oreder of value for loop to function.
+        {
+            std::swap(x1,x2);
+            std::swap(y1,y2);
+        }
+
+        for(int x = x1; x < x2 ; x++)
+        {
+            float pros = ((float)x - (float)x1) / ((float)x2 - (float)x1);
+            Color c = color.GetColor(pros);
+            SDL_SetRenderDrawColor(RenderInformation,c.r, c.g, c.b, c.a);
+            SDL_RenderDrawPoint(RenderInformation, x, y1 + m * (x - x1));
+        }
+    }
+    else //Vertical draw.
+    {
+        float m = Vector2Int::Slope({y1,x1},{y2,x2});
+        if(y2 < y1) //Swaping oreder of value for loop to function.
+        {
+            std::swap(x1,x2);
+            std::swap(y1,y2);
+        }
+        
+        for(int y = y1; y < y2; y++)
+        {
+            float pros = ((float)y - (float)y1) / ((float)y2 - (float)y1);
+            Color c = color.GetColor(pros);
+            SDL_SetRenderDrawColor(RenderInformation,c.r, c.g, c.b, c.a);
+            SDL_RenderDrawPoint(RenderInformation, m*(y-y1) + x1, y);
+        }
+    }
+}
+
+void DrawLineSimple(Vector2Int v1, Vector2Int v2, ColorGradient color)
+{
+    DrawLineSimple(v1.x, v1.y, v2.x, v2.y, color);
+}
+
+void DrawLineSimple(Vector2 v1, Vector2 v2, ColorGradient color)
+{
+    DrawLineSimple(static_cast<int>(v1.x), static_cast<int>(v1.y), static_cast<int>(v2.x), static_cast<int>(v2.y), color);
+}
+
+void DrawLineSimple(float x1, float y1, float x2, float y2, ColorGradient color)
+{
+    DrawLineSimple(static_cast<int>(x1), static_cast<int>(y1), static_cast<int>(x2), static_cast<int>(y2), color);
+}
+
 void DrawLineAntiAliasing(float x1, float y1, float x2, float y2, Color color)
 {
     int steep = abs(y2 - y1) > abs(x2 - x1);
@@ -143,6 +203,71 @@ void DrawLineAntiAliasing(int x1, int y1, int x2, int y2, Color color)
 }
 
 void DrawLineAntiAliasing(Vector2Int v1, Vector2Int v2, Color color)
+{
+    DrawLineAntiAliasing(static_cast<float>(v1.x),static_cast<float>(v1.y),static_cast<float>(v2.x),static_cast<float>(v2.y),color);
+}
+
+void DrawLineAntiAliasing(float x1, float y1, float x2, float y2, ColorGradient color)
+{
+    int steep = abs(y2 - y1) > abs(x2 - x1);
+    if(steep) //Swapping horizontal with vectical.
+    {
+        std::swap(x1,y1);
+        std::swap(x2,y2);
+    }
+    if(x1 > x2) //Swapping first one to be most left one.
+    {
+        std::swap(x1,x2);
+        std::swap(y1,y2);
+    }
+
+    float m = Vector2::Slope({x1,y1},{x2,y2});
+    if(x2 - x1 == 0)
+    {
+        m = 1;
+    }
+    float intersectY = y1;
+
+    if(steep)
+    {
+        int x;
+        for(x = x1; x <= x2; x++)
+        {
+            float pros = ((float)x - (float)x1) / ((float)x2 - (float)x1);
+            Color c = color.GetColor(pros);
+            SDL_SetRenderDrawColor(RenderInformation,c.r, c.g, c.b, c.a * (intersectY - int(intersectY)));
+            SDL_RenderDrawPoint(RenderInformation, int(intersectY), x);
+            SDL_SetRenderDrawColor(RenderInformation,c.r, c.g, c.b, c.a * (1 - (intersectY - int(intersectY))));
+            SDL_RenderDrawPoint(RenderInformation, int(intersectY) - 1, x);
+            intersectY += m;
+        }
+    }
+    else
+    {
+        for(int x = x1; x <= x2; x++)
+        {
+            float pros = ((float)x - (float)x1) / ((float)x2 - (float)x1);
+            Color c = color.GetColor(pros);
+            SDL_SetRenderDrawColor(RenderInformation, c.r, c.g, c.b, c.a * (intersectY - int(intersectY)));
+            SDL_RenderDrawPoint(RenderInformation,x, int(intersectY));
+            SDL_SetRenderDrawColor(RenderInformation, c.r, c.g, c.b, c.a * (1 - (intersectY - int(intersectY))));
+            SDL_RenderDrawPoint(RenderInformation, x, int(intersectY) - 1);
+            intersectY += m;
+        }
+    }
+}
+
+void DrawLineAntiAliasing(Vector2 v1, Vector2 v2, ColorGradient color)
+{
+    DrawLineAntiAliasing(v1.x, v1.y, v2.x, v2.y, color);
+}
+
+void DrawLineAntiAliasing(int x1, int y1, int x2, int y2, ColorGradient color)
+{
+    DrawLineAntiAliasing(static_cast<float>(x1),static_cast<float>(y1),static_cast<float>(x2),static_cast<float>(y2),color);
+}
+
+void DrawLineAntiAliasing(Vector2Int v1, Vector2Int v2, ColorGradient color)
 {
     DrawLineAntiAliasing(static_cast<float>(v1.x),static_cast<float>(v1.y),static_cast<float>(v2.x),static_cast<float>(v2.y),color);
 }
@@ -231,7 +356,7 @@ void renderFrame(Component *root, double elapsed)
     // ----- Draw background ----- //
     SDL_SetRenderDrawColor(RenderInformation, backgroundColour[0], backgroundColour[1], backgroundColour[2], 255);
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
-    
+
     for(int i = 290; i < 300; i++)
     {
         DrawLineSimple(i,195,i,1000,{200,200,200,255});
@@ -244,21 +369,24 @@ void renderFrame(Component *root, double elapsed)
         Curve({CurveKey(0.0f, 1.0f, Tangent(),Tangent(Tangent::Interpolation::Constant)),CurveKey(5.0f/18.0f, 108.0f / 255.0f,Tangent(),Tangent(Tangent::Interpolation::Constant)), CurveKey(8.0f/18.0f, 1.0f,Tangent(),Tangent(Tangent::Interpolation::Constant))}),
         Curve::One()
     );
-    ColorGradient cg2 = ColorGradient(Color(0,47,108,255)); //Blue
+    char arr[] = "#002F6C";
+    ColorGradient cg2 = ColorGradient(Color(arr)); //Blue
 
     float scale = 20.0f;
     Vector2 size = {18,11};
     Vector2 pos = {300,200};
-    Vector2 end = {300 + size.x * scale,200};
-    float CurveHeight = 40.0f;
+    float width = size.x * scale + cos(elapsed) * 10;
+    Vector2 end = {300 + width, 200};
+    float CurveHeight = 20.0f;
     Curve c = Curve();
 
-    float count = 20.0f;
-    for(float i = 0.0f; i < count; i += 1.0f / count)
+    float count = 10.0f;
+    c.keys.push_back(CurveKey(0,0));
+    for(float i = 1.0f / count; i < count; i += 1.0f / count)
     {
-        c.keys.push_back(CurveKey(i, i * sin(3.0f * elapsed + i * M_PI)));
+        c.keys.push_back(CurveKey(i, sin((elapsed * 5 + i * 16 / count * M_PI))));
     }
-
+    c.SetLinearInterpolationAll();
     for(int i = 0; i < size.y * scale / 4.0f; i++)
     {
         DrawLineCurve(pos + Vector2::Up() * i,end + Vector2::Up() * i,cg1,c,CurveHeight);

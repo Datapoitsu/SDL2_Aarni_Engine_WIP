@@ -367,6 +367,11 @@ struct Vector2{
         return (v2.y - v1.y) / (v2.x - v1.x);
     }
 
+    static float Slope(Vector2 v)
+    {
+        return Slope(Vector2::Zero(), v);
+    }
+
     static Vector2 Abs(Vector2 v)
     {
         return {abs(v.x),abs(v.y)};
@@ -607,6 +612,11 @@ struct Vector2Int{
     {
         return static_cast<float>(v2.y - v1.y) / static_cast<float>(v2.x - v1.x);
     }
+
+    static float Slope(Vector2Int v)
+    {
+        return Slope(Vector2Int::Zero(), v);
+    }    
 
     static Vector2Int Abs(Vector2Int v)
     {

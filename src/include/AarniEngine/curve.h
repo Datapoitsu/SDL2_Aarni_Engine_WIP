@@ -69,11 +69,6 @@ struct CurveKey
     Tangent tangentIn, tangentOut;
     CurveKey(float time = 0.0f, float value = 0.0f, Tangent tin = Tangent(), Tangent tout = Tangent()): time(time), value(value), tangentIn(tin), tangentOut(tout){};
 
-    bool ComparePosition(const CurveKey &a, const CurveKey &b)
-    {
-        return a.time < b.time;
-    }
-
     // ----- Printing ----- //
     friend std::ostream& operator<<(std::ostream& os, const CurveKey& pt); //overriding << operator
 };
@@ -87,12 +82,22 @@ std::ostream &operator<<(std::ostream &os, const CurveKey &k) // overriding << o
 //Keys need to be sorted based on time.
 class Curve
 {
+    private:
+    static bool compareCurves(const CurveKey& a, const CurveKey& b) {
+        return a.time < b.time;
+    }
+
+    void SortKeys()
+    {
+        std::sort(keys.begin(), keys.end(), compareCurves);
+    }
+
     public:
     std::vector<CurveKey>keys;
-    Curve(std::vector<CurveKey>keys = {}):keys(keys){};
+    Curve(std::vector<CurveKey>keys = {}):keys(keys){ SortKeys(); };
     static Curve ConstantValue(float v){ return Curve({CurveKey(0.0f,v,Tangent(Tangent::Interpolation::Constant),Tangent(Tangent::Interpolation::Constant))}); } 
-    static Curve One(){ return Curve({CurveKey(0.0f,1.0f,Tangent(Tangent::Interpolation::Constant))}); } 
-    static Curve Zero(){ return Curve({CurveKey(0.0f,0.0f,Tangent(Tangent::Interpolation::Constant))}); } 
+    static Curve One(){ return Curve(ConstantValue(1.0f)); } 
+    static Curve Zero(){ return Curve(ConstantValue(0.0f)); } 
     static Curve AscendingLinear(){ return Curve({CurveKey(0.0f,0.0f,Tangent(Tangent::Interpolation::Linear)),CurveKey(1.0f,1.0f,Tangent(Tangent::Interpolation::Linear))}); } 
     static Curve DescesendingLinear(){ return Curve({CurveKey(0.0f,0.1f,Tangent(Tangent::Interpolation::Linear)),CurveKey(1.0f,0.0f,Tangent(Tangent::Interpolation::Linear))}); } 
     static Curve EasyInCubic(){ return Curve({CurveKey(0.0f,0.0f,Tangent(Tangent::Interpolation::Cubic)),CurveKey(1.0f,1.0f,Tangent(Tangent::Interpolation::Cubic, -M_PI / 2))}); } 
@@ -100,10 +105,11 @@ class Curve
     static Curve EasyOutCubic(){ return Curve({CurveKey(0.0f,0.0f,Tangent(Tangent::Interpolation::Cubic, M_PI / 2)),CurveKey(1.0f,1.0f,Tangent(Tangent::Interpolation::Cubic))}); } 
     static Curve EasyOutCubicMirrored(){ return Curve({CurveKey(0.0f,1.0f,Tangent(Tangent::Interpolation::Cubic, -M_PI / 2)),CurveKey(1.0f,0.0f,Tangent(Tangent::Interpolation::Cubic))}); } 
 
+
     void AddKey(CurveKey key)
     {
         keys.push_back(key);
-        //SortKeys();
+        SortKeys();
     }
 
     void Addkeys(std::vector<CurveKey> keyList)
@@ -188,11 +194,8 @@ class Curve
         CubicHermiteInterpolation(time,2) * keys[index + 1].value +
         CubicHermiteInterpolation(time,3) * keys[index + 1].tangentIn.GetWeightedSlope();
     }
-    private:
-    void SortKeys(){
-        //std::sort(keys.begin(),keys.end(), CurveKey::ComparePosition);
-    }
 
+    private:
     // ----- Printing ----- //
     friend std::ostream& operator<<(std::ostream& os, const Curve& pt); //overriding << operator
 };
