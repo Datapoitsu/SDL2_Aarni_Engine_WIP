@@ -1,7 +1,7 @@
 #ifndef _COMPONENTH_
 #define _COMPONENTH_
 
-#include <AarniEngine/Engine.h>
+#include <AarniEngine/engine.h>
 
 enum ComponentType {
     empty,
