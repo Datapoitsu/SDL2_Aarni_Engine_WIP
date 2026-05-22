@@ -382,9 +382,11 @@ void renderFrame(Component *root, double elapsed)
 
     float count = 10.0f;
     c.keys.push_back(CurveKey(0,0));
+    float smoothingCount = (1.0f / count) * 3;
     for(float i = 1.0f / count; i < count; i += 1.0f / count)
     {
-        c.keys.push_back(CurveKey(i, sin((elapsed * 5 + i * 16 / count * M_PI))));
+        float smoothingMultiplier = std::min(1.0f, (i/smoothingCount));
+        c.keys.push_back(CurveKey(i, smoothingMultiplier * sin((elapsed * 5 + i * 16 / count * M_PI))));
     }
     c.SetLinearInterpolationAll();
     for(int i = 0; i < size.y * scale / 4.0f; i++)
