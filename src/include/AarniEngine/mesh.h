@@ -1,7 +1,7 @@
 #ifndef _MESHH_
 #define _MESHH_
 #include <AarniEngine/vector.h>
-#include <AarniEngine/transform.h>
+#include <AarniEngine/Components/transform.h>
 
 #include <iostream>
 #include <fstream>

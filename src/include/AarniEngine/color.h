@@ -38,6 +38,26 @@ struct Color
     static Color Purple(){ return {255,0,255,255};}
     static Color Cyan(){ return {0,255,255,255};}
 
+    float GetValueProsentRed()
+    {
+        return r / 255.0f;
+    }
+
+    float GetValueProsentGreen()
+    {
+        return g / 255.0f;
+    }
+
+    float GetValueProsentBlue()
+    {
+        return b / 255.0f;
+    }
+
+    float GetValueProsentAlpha()
+    {
+        return a / 255.0f;
+    }
+
     static Color SetValueProsent(float redProsent = 1.0f, float greenProsent = 1.0f, float blueProsent = 1.0, float alphaProsent = 1.0f)
     {
         return Color(

@@ -20,11 +20,11 @@
 
 #include <AarniEngine/component.h>
 
-#include <AarniEngine/transform.h>
-#include <AarniEngine/renderer.h>
-#include <AarniEngine/camera.h>
-#include <AarniEngine/circleCollider.h>
-#include <AarniEngine/ball.h>
+#include <AarniEngine/Components/transform.h>
+#include <AarniEngine/Components/renderer.h>
+#include <AarniEngine/Components/camera.h>
+#include <AarniEngine/Components/circleCollider.h>
+#include <AarniEngine/Components/ball.h>
 
 Component *root = new Component(); //root object. Every thing will be built on top of this. Components consists an array of child components.
 

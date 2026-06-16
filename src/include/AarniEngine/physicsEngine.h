@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <AarniEngine/component.h>
-#include <AarniEngine/circleCollider.h>
+#include <AarniEngine/Components/circleCollider.h>
 
 std::vector<Component*> physicsComponents;
 std::vector<Transform*> physicsComponentsTransforms;
