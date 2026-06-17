@@ -3,8 +3,9 @@
 
 #include <SDL2/SDL_image.h>
 #include <string>
+#include <AarniEngine/sprite.h>
 #include <AarniEngine/component.h>
-#include <AarniEngine/Components/ball.h>
+
 
 //Application variables
 SDL_Window *Window;
@@ -15,7 +16,7 @@ int backgroundColour[3] = {125,125,125};
 
 bool createWindow()
 {
-    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_Init(SDL_INIT_VIDEO);
 
     Window = SDL_CreateWindow("SDL Practice",SDL_WINDOWPOS_UNDEFINED,SDL_WINDOWPOS_UNDEFINED,screenWidth,screenHeigth,SDL_WINDOW_ALLOW_HIGHDPI);
     if (Window != NULL)
@@ -559,7 +560,7 @@ void drawTriangleFill(float x1, float y1, float x2, float y2, float x3, float y3
 void renderSprite(const char* path, SDL_Rect dstRect, SDL_Rect srcRect)
 {
     char buffer[128];
-    strcpy(buffer, "src/Game/Sprites/");
+    strcpy(buffer, "src/Include/AarniEngine/sprites/");
     strcat(buffer, path);
     std::cout << buffer << std::endl;
     SDL_Surface* surface = IMG_Load(buffer);
@@ -582,7 +583,7 @@ void renderFrame(Component *root, double elapsed)
     SDL_RenderClear(RenderInformation); //Fills the screen with the background colour
     SDL_Rect srcRect = {0,0,32,32};
     SDL_Rect dstRect = {0,0,500,500};
-    renderSprite("BrickWall.png", dstRect, srcRect);
+    //renderSprite("Keys.png", dstRect, srcRect);
     drawLineAntiAliasing(500,500,600,600);
 
     SDL_RenderPresent(RenderInformation); //Draws things.

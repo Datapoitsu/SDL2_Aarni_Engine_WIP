@@ -10,6 +10,7 @@ enum ComponentType {
     camera,
     circleCollider2D,
     ball,
+    spriteRenderer,
 };
 
 class Component

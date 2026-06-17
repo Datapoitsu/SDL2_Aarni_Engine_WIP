@@ -4,8 +4,19 @@
 #include <iostream>
 #include <stdlib.h>
 #include <time.h>
-#include <windows.h>
 #include <vector>
+
+#ifdef __linux__
+	#include <unistd.h>
+
+    void Sleep(int milliseconds)
+    {
+        usleep(milliseconds*1000);
+    }
+#endif
+#ifdef __MINGW32__
+    #include <windows.h>
+#endif
 
 //SDL2
 #include <SDL2/SDL.h>
@@ -39,7 +50,7 @@ bool endApp = false;
 
 // ----- Time ----- //
 double deltaTime;
-timeval t1, t2; //Time at start and end of the frame
+clock_t t1, t2; //Time at start and end of the frame
 double elapsedTime;
 double sessionTime = 0; //Total time the session has been on.
 int fpsLimiter = 60;
@@ -62,7 +73,7 @@ int main(int argc, char *argv[])
     root->StartRecursive();
     
     //Begining of calculating time.
-    mingw_gettimeofday(&t1, NULL); 
+    t1 = clock();
     
     while (true)
     {
@@ -92,10 +103,9 @@ int main(int argc, char *argv[])
         Sleep(std::max(0.0,(1000 / fpsLimiter) - (deltaTime * 1000)));
 
         //Calculating passing time.
-        mingw_gettimeofday(&t2, NULL);
-        elapsedTime = (t2.tv_sec - t1.tv_sec) * 1000.0;
-        elapsedTime += (t2.tv_usec - t1.tv_usec) / 1000.0;
-        deltaTime = elapsedTime / 1000;
+        t2 = clock();
+        elapsedTime = ((double)(t2 - t1)) / ((double)CLOCKS_PER_SEC);
+        deltaTime = elapsedTime;
         t1 = t2;
         sessionTime += deltaTime;
     }
