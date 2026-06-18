@@ -36,6 +36,7 @@
 #include <AarniEngine/Components/camera.h>
 #include <AarniEngine/Components/circleCollider.h>
 #include <AarniEngine/Components/ball.h>
+#include <AarniEngine/Components/spriteRenderer.h>
 
 Component *root = new Component(); //root object. Every thing will be built on top of this. Components consists an array of child components.
 

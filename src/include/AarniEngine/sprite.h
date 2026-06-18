@@ -20,6 +20,7 @@ struct Sprite
     int countVer = 1;
 
     char imageName[128];
+    int currentIndex = 0; //Which image of the spritesheet is used.
     SDL_Surface *sourceImage;
 
     void loadSprite(const char* path)

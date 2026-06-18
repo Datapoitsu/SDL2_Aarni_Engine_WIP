@@ -5,7 +5,7 @@
 #include <AarniEngine/sprite.h>
 #include <AarniEngine/renderEngine.h>
 
-class CustomComponent: public Component
+class SpriteRenderer: public Component
 {
     public:
         Sprite sprite;
@@ -14,7 +14,7 @@ class CustomComponent: public Component
             componentType = spriteRenderer;
         }
 
-        void Update(double deltaTime) override
+        void Update(double deltaTime)
         {
             
         }

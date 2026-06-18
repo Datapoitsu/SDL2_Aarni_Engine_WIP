@@ -557,23 +557,15 @@ void drawTriangleFill(float x1, float y1, float x2, float y2, float x3, float y3
     drawTriangleFill(arr,color);
 }
 
-void renderSprite(const char* path, SDL_Rect dstRect, SDL_Rect srcRect)
-{
-    char buffer[128];
-    strcpy(buffer, "src/Include/AarniEngine/sprites/");
-    strcat(buffer, path);
-    std::cout << buffer << std::endl;
-    SDL_Surface* surface = IMG_Load(buffer);
-    if (!surface) {
-        SDL_Log("IMG_Load failed: %s", IMG_GetError());
-        return;
-    }
-    
-    SDL_Texture* texture =
-        SDL_CreateTextureFromSurface(RenderInformation, surface);
-    SDL_FreeSurface(surface);
 
-    SDL_RenderCopy(RenderInformation, texture, NULL, &dstRect); // &srcRect, &dstRect);
+
+void renderSprite(Sprite sprite, SDL_Rect dstRect)
+{
+    SDL_Texture* texture =
+        SDL_CreateTextureFromSurface(RenderInformation, sprite.sourceImage);
+    SDL_FreeSurface(sprite.sourceImage);
+
+    //SDL_RenderCopy(RenderInformation, texture, &(sprite.GetSrcRect(sprite.currentIndex)), &dstRect); // &srcRect, &dstRect);
 }
 
 void renderFrame(Component *root, double elapsed)
